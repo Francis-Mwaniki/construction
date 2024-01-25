@@ -7,6 +7,7 @@ import ChatRoom from './components/room';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
+import LoadingIndicator from './components/verticalLoader';
 
 
 export default function App() {
@@ -18,7 +19,7 @@ export default function App() {
     setTimeout(() => {
       setloading(false);
     }
-      , 1000);
+      , 4000);
 
   
   }, []);
@@ -27,11 +28,10 @@ export default function App() {
   return (
     <>
     {
-      loading ? (
-        <div className="flex justify-center items-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
-        </div>
-      ) : (
+      loading && (
+       <LoadingIndicator />
+      ) 
+    }
        <>
        <div className="flex min-h-screen flex-col">
       <Header 
@@ -43,8 +43,7 @@ export default function App() {
      
     </div>
        </>
-      )
-    }
+   
     </>
     
   );

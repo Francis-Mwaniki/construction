@@ -5,9 +5,13 @@ import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { JSX, SVGProps } from "react";
+import { Pencil, Trash } from "lucide-react"
+import LoadingIndicator from './verticalLoader';
+import VerticalLoader from './verticalLoader';
 interface Message {
   id: string;
-  sender: string;
+  sender: any;
+    //object 
   content: string;
 }
 
@@ -28,6 +32,7 @@ const Chat = ({ roomId, username, userId }: ChatProps) => {
   const [isTypingDebounced, setIsTypingDebounced] = useState<boolean>(false);
   const [user, setUser] = useState('')
   const [localuser, setLocalUser] = useState('')
+  const [hasSent, setHasSent] = useState(false);
 const [sending, setSending] = useState<boolean>(false);
 
   const handleSendMessage = (e: any) => {
@@ -38,11 +43,32 @@ const [sending, setSending] = useState<boolean>(false);
     }
     socket.emit('chatMessage', inputMessage, userId, roomId);
     socket.emit('typing', username, roomId);
-    setTimeout(() => {
+    setHasSent(true);
+
+
+    // socket.on('chatMessage', (message: Message) => {
+    //   console.log("------------------logs 1-----------------");
+      
+    //   console.log(message);
+
+    //     debouncedSetMessages(message);
+    // }
+    // );
+    setTimeout(async () => {
+
       setSending(false)
     }
-      , 2000);
+      , 3000);
     setInputMessage(''); // Clear the input field after sending the message
+  };
+
+  const editMessage = (id: string) => {
+    const message = messages.find((message) => message.id === id);
+    if (message) {
+      setInputMessage(message.content);
+    }
+
+    socket.emit('editMessage', messages.filter((message) => message.id === id));
   };
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -63,6 +89,38 @@ const [sending, setSending] = useState<boolean>(false);
     setMessages((prevMessages) => [...prevMessages, message]);
   }, 300);
 
+//ferch messages from the backend https://localhost:5000/api/auth/messages-rd
+const fetchChatMessagese = async () => {
+  try {
+    const res = await fetch(`http://localhost:5000/api/auth/messages-rd/${roomId}`);
+    
+    if (res.ok) {
+      const data = await res.json();
+      const messagesArray: Message[] = Object.values(data);
+
+      setMessages(messagesArray);
+    } else {
+      console.error("Error fetching messages:", res.statusText);
+    }
+  } catch (error: any) {
+    console.error("Error fetching messages:", error.message);
+  }
+
+
+}
+
+/* call fetch after 3 sec every 3 sec */
+useEffect(() => {
+   setInterval(() => {
+    fetchChatMessagese();
+  }, 500);
+  // return () => clearInterval(interval);
+}
+, [
+ inputMessage,
+
+]);
+
   useEffect(() => {
     if (inputMessage) {
       socket.emit('typing', username, roomId);
@@ -74,21 +132,23 @@ const [sending, setSending] = useState<boolean>(false);
       setIsTyping(true);
       setTypingUser(username);
     });
-  }, []);
+
+    // fetchChatMessagese();
+  }, [
+    roomId,
+  ]);
 
    // emit fetchChatMessages
      // socket.emit('fetchChatMessages', roomId);
      useEffect(() => {
-     if(roomId){
-      socket.emit('fetchChatMessages', roomId) 
-       
-      socket.on('chatMessage', (message) => {
+      console.log("------------------logs 2-----------------");
+      socket.on('chatMessage', (message: Message[]) => {
         console.log("from the backend", message);
           debouncedSetMessages(message);
           console.log("debouncedSetMessages", debouncedSetMessages);
           
       });
-     }
+     
     }
     , [
       roomId,
@@ -149,11 +209,15 @@ const [sending, setSending] = useState<boolean>(false);
 
   return (
     <>
-      {isConnected && (
+       {!isConnected && (
+        <div className="absolute top-0  w-full flex items-center justify-center bg-white">
+          <LoadingIndicator />
+        </div>
+      )}
         <div className="w-full h-full flex flex-col lg:flex-row relative">
           
           {/* Aside Section */}
-          <aside className="w-full lg:w-1/3 h-full border-r lg:border-r-0 lg:border-b overflow-auto">
+          <aside className="w-full lg:w-[28%] h-full border-r lg:border-r-0 lg:border-b overflow-auto sm:sticky sm:z-20 sm:bg-white  sm:left-0 ">
             <div className="p-4">
               <h2 className="text-xl font-bold">Contacts</h2>
             </div>
@@ -183,7 +247,7 @@ const [sending, setSending] = useState<boolean>(false);
           </aside>
 
           {/* Section Section */}
-          <section className="w-full lg:w-2/3 h-full flex flex-col divide-x-2 divide-gray-200 min-h-screen ">
+          <section className="w-full sm:left-[28%] lg:w-2/3 h-full flex flex-col divide-x-2 divide-gray-200 min-h-screen sm:absolute ">
             {/* Header */}
             <header className="flex items-center justify-between p-4 border-b">
               <h2 className="text-xl font-bold">
@@ -201,15 +265,22 @@ const [sending, setSending] = useState<boolean>(false);
 
               {messages.map((message) => (
                 <>
-                <div key={message.id} className={`flex ${message.sender === `${username}`
-                   ? 'justify-start' : 'justify-end'} items-end mb-4`}>
+                
+                 <div key={message.id} className={`flex ${message.sender.username === `${localuser}`
+    ? 'justify-start' : 'justify-end'} items-end mb-4`}>
+       <img
+                    src={`https://ui-avatars.com/api/?name=${message.sender.username}`}
+                    alt={user}
+                    className="w-7 h-7 rounded-full mr-1"
+                  />
     <div
-      className={`max-w-xs mx-2 my-2 p-4 rounded-lg ${message.sender === 'Me' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+      className={`max-w-xs mx-2 my-2 p-4 rounded-lg ${message.sender === `${localuser}`
+       ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
     >
       <p className="text-sm flex  flex-col
        min-w-[100px] 
        ">
-        <span>{message.content} - <span className="text-xs text-gray-500">{message.sender}</span></span>
+        <span>{message.content} - <span className="text-xs text-gray-500">{message.sender.username}</span></span>
         <span className="text-[10px]
          text-gray-500">{new Date().toLocaleTimeString()}</span>
 
@@ -218,9 +289,10 @@ const [sending, setSending] = useState<boolean>(false);
 
       
           <button 
-          className="text-red-500 float-end flex justify-end "
+          className="  gap-x-4 float-end flex justify-end "
           >
-            <TrashIcon onClick={() => deleteFromSocket(message.id)} className="h-5 w-5" />
+            <Trash onClick={() => deleteFromSocket(message.id)} className="h-5 w-5 " />
+            <Pencil onClick={() => editMessage(message.id)} className="h-5 w-5" />
           </button>
       </p>
     </div>
@@ -261,7 +333,9 @@ const [sending, setSending] = useState<boolean>(false);
        min-w-[100px] 
        ">
         <span className="text-xs text-gray-500">{new Date().toLocaleTimeString()}</span>
-        <span className="text-xs text-gray-500">sending...</span>
+        <span className="text-xs text-gray-500">
+         sending...
+        </span>
       </p>
     </div>
   </div>
@@ -273,18 +347,17 @@ const [sending, setSending] = useState<boolean>(false);
             {/* Message Input */}
             <div className="p-4 border-t  sm:sticky bg-white fixed bottom-1 inset-x-0 z-20">
               <p className="text-xs text-gray-500 mb-2">
-                {isTyping ? `${typingUser} is typing...` : ''}
+                {isTyping && `${typingUser} is typing...` }
               </p>
               {/* sending  message*/}
               <div className="flex justify-center items-center">
               {
-                sending ? (
+                sending && (
                  
-                  <p className="text-xs text-gray-800 text-center py-2  rounded mb-2">
-                    sending...
+                  <p className="text-xs text-gray-800 text-center py-2  rounded w-full min-w-[400px] mb-2">
+                     <VerticalLoader />
+                      
                   </p>
-                ) : (
-                  ''
                 )
               }
               </div>
@@ -309,14 +382,9 @@ const [sending, setSending] = useState<boolean>(false);
             </div>
           </section>
         </div>
-      )}
+      
 
-      {!isConnected && (
-        /* loading */
-        <div className="flex items-center justify-center flex-1">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-        </div>
-      )}
+     
     </>
   );
 };
@@ -367,6 +435,50 @@ function XIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
 }
 
 function TrashIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#000000"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 6 5 6 21 6" />
+      <path d="m5 6 0 15 14 0 0-15" />
+      <path d="m10 11 0 6" />
+      <path d="m14 11 0 6" />
+    </svg>
+  )
+}
+
+function EditIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#000000"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 6 5 6 21 6" />
+      <path d="m5 6 0 15 14 0 0-15" />
+      <path d="m10 11 0 6" />
+      <path d="m14 11 0 6" />
+    </svg>
+  )
+}
+
+function PenIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
