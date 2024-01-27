@@ -4,8 +4,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
  const [loading, setLoading] = useState(false);
@@ -17,20 +19,22 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('/api/auth/login', {
         username,
         password,
         email,
       });
 
       console.log(response.data);
-      if (!response.data) {
-        return alert('User does not exist');
+      if (response.data.status === 400 || response.data.status === 401) {
+        alert(response.data.message);
+        setLoading(false);
+        return;
       }
 
       let token = response.data.token;
-      let user = response.data.userInfo.username
-      let id = response.data.id;
+      let user : any = response.data.user.username;
+      let id = response.data.user.id;
       const roomId = localStorage.getItem('roomId');
      
      
@@ -41,7 +45,7 @@ const Login = () => {
         localStorage.setItem('roomId', roomId || generateRoomId());
 
         setLoading(false);
-        window.location.href = '/createRoom';
+        router.push('/createRoom');
       
 
     } catch (error) {
@@ -51,8 +55,8 @@ const Login = () => {
   };
 
   return (
-    <div className="">
-      <h2 className="text-2xl font-semibold mb-6">Login</h2>
+    <div className="shadow-lg  bg-white  p-16 rounded">
+      <h2 className="text-2xl font-semibold mb-6">Welcome Back</h2>
       <div className="mb-4">
         <Input
           type="text"
@@ -103,6 +107,38 @@ const Login = () => {
             )
         }
       </Button>
+      <div className='my-4 ' />
+       
+
+            <p className="text-center text-gray-500 text-xs">
+            &copy;2021 Our Services. All rights reserved.
+            </p>
+            <p className="text-center text-gray-500 text-xs">
+            By continuing, you agree to our User Agreement and Privacy Policy.
+            </p>
+            <h5 className="text-center text-gray-500 text-xs">
+            Have an account?
+             <a
+            className="text-blue-500  mx-2  hover:text-blue-600 hover:underline"
+           href="/Login">Login</a>
+            </h5>
+            
+            <h5 className="text-center mx-2 text-gray-500 text-xs">
+            New to Our Services? 
+             <a
+            className="text-blue-500   hover:text-blue-600 hover:underline"
+           href="/Register">Register</a>
+            </h5>
+     
+
+       
+            <div className="flex items-center my-5 justify-between">
+            <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
+            <a href="#" className="text-xs text-center  uppercase hover:underline">Login as Expert</a>
+            <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
+            </div>
+
+
     </div>
   );
 };

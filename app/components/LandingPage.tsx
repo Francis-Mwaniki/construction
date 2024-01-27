@@ -2,7 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { KanbanSquare, LucideArrowDownRight, RefreshCcw } from "lucide-react";
 import Link from "next/link"
+import Contact from "./contact";
 import { JSX, SVGProps, useState } from "react"
+
+
 
 export default function Component() {
     const [picsNames, setpicsNames] = useState<string[]>([
@@ -68,8 +71,42 @@ export default function Component() {
           description: 'Our experts provide high-quality masonry services.',
         },
       ];
-       
-    
+      const scrollToSection = (id: string) => {
+        const section = document.getElementById(id);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+      const handleClickSection = (section:string,e: { preventDefault: () => void; } | undefined) => {
+        e?.preventDefault();
+        if(section === 'home-section'){
+         scrollToSection('home-section')
+        //  setIsOpen(false)
+       }
+       else if(section === 'contact-section'){
+         scrollToSection('contact-section')
+        //  setIsOpen(false)
+       }
+         else if(section === 'experts-section'){
+            scrollToSection('experts-section')
+          //  setIsOpen(false)
+         }
+       else if(section === 'projects-section'){
+        scrollToSection('projects-section')
+       //  setIsOpen(false)
+      }
+       else if(section === 'pricing-section'){
+         scrollToSection('pricing-section')
+        //  setIsOpen(false)
+       }
+       else if(section === 'services-section'){
+         scrollToSection('services-section')
+        //  setIsOpen(false)
+       }
+       else{
+         return
+       }
+       }
 
     
 
@@ -80,26 +117,34 @@ export default function Component() {
    
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="flex items-center justify-between px-4 py-5 border-b">
-        <Link className="flex items-center gap-2" href="#">
+    <div className="flex flex-col min-h-screen relative">
+      <header className="flex items-center justify-between bg-white opacity-70  px-4 py-5 border-b fixed z-20 top-0 inset-x-0">
+        <a onClick={handleClickSection.bind(null,'home-section')}  className="flex items-center gap-2" >
           <ConstructionIcon className="h-6 w-6" />
           <span className="text-lg font-semibold">ConCorp </span>
-        </Link>
+        </a>
         <nav className="flex gap-4">
-          <Link className="text-sm font-medium hover:underline" href="#">
-            About
-          </Link>
-          <Link className="text-sm font-medium hover:underline" href="#">
+          <a onClick={handleClickSection.bind(null,'experts-section')} 
+           className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " >
+            Experts
+          </a>
+          <a onClick={handleClickSection.bind(null,'services-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " >
             Services
-          </Link>
-          <Link className="text-sm font-medium hover:underline" href="#">
+          </a>
+          <a onClick={handleClickSection.bind(null,'projects-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " >
+            projects
+          </a>
+          <a onClick={handleClickSection.bind(null,'contact-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " >
             Contact
+          </a>
+          <Link  className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " href="/Login">
+            Login / Register
           </Link>
+          
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+        <section id="home-section" className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -128,7 +173,7 @@ export default function Component() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-200 dark:bg-gray-700">
+        <section id="projects-section" className="w-full py-12 md:py-24 lg:py-32 bg-gray-200 dark:bg-gray-700">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -151,7 +196,8 @@ export default function Component() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32">
+       
+        <section id="services-section" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Our Services</h2>
@@ -161,7 +207,8 @@ export default function Component() {
             </div>
             <div className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {services.map((service, index) => (
-        <Link key={index} href={`/services/${encodeURIComponent(service.title)}`}>
+        <Link key={Date.now() + index}
+         href={`/services/${encodeURIComponent(service.title)}`}>
           <div>
             <div className="flex flex-col items-center space-y-4 transition-shadow duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
               {service.icon}
@@ -174,7 +221,7 @@ export default function Component() {
     </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section id="experts-section" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -186,7 +233,10 @@ export default function Component() {
               <div className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {
   picsNames.map((name, index) => (
-    <div key={index} className="flex flex-col items-center space-y-4 transition-shadow duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
+    <Link key={Date.now() + index}
+     href={`/Experts/${encodeURIComponent(name)}`}>
+    <div key={Date.now() + index}
+     className="flex flex-col items-center space-y-4 transition-shadow duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
       <img
         className="h-24 w-24 rounded-full object-cover"
         src={`https://ui-avatars.com/api/?background=random&name=${name}`}
@@ -213,6 +263,7 @@ export default function Component() {
         </svg>
     </button>
     </div>
+    </Link>
   ))
   
 }
@@ -232,6 +283,10 @@ export default function Component() {
             </div>
           </div>
         </section>
+         {/* contact */}
+         <section id="contact-section" className="w-full sm:w-1/2 mx-auto py-12 md:py-24 lg:py-32">
+            <Contact />
+            </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 ConCorp . All rights reserved.</p>
