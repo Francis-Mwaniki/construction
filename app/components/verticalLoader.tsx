@@ -70,7 +70,7 @@ const Load = () => {
     randomColor(),
     randomColor(),
   ]);
-  const duration = 130;
+  const duration = 10;
 
 
    
