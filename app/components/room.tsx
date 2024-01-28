@@ -10,9 +10,16 @@ interface IMsgDataTypes {
   user: string;
   msg: string;
   time: string;
-}
 
-const ChatPage = ({ socket, username, roomId }: any) => {
+}
+interface RoomProps {
+  onMessageSent: () => void;
+  socket: any;
+  username: string;
+  roomId: string;
+}
+const ChatPage = ({ socket, username, roomId , onMessageSent}: RoomProps) => {
+  
   const [currentMsg, setCurrentMsg] = useState("");
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
   const [sending, setSending] = useState(false);
@@ -35,6 +42,7 @@ const ChatPage = ({ socket, username, roomId }: any) => {
         setSending(false);
       }
       , 1000);
+      onMessageSent();
       setCurrentMsg("");
     }
   };
@@ -111,7 +119,7 @@ const ChatPage = ({ socket, username, roomId }: any) => {
         </header>
 
         {/* Chat Messages */}
-        <div className="flex-1 overflow-auto p-4 space-y-4 ">
+        <div className="flex-1 overflow-auto p-4 space-y-4 sm:my-3 my-10 ">
          
 
            {chat.map(({ user, msg }, key) => (

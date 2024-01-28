@@ -4,12 +4,48 @@ import { io } from "socket.io-client";
 import ChatPage from "../components/room";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Copy, Loader, Loader2, Share } from "lucide-react";
+import MessageBalance from "../components/MessageBalance";
+import UpgradePrompt from "../components/Upgrade";
+import MessageList from '../components/MessagesList';
 
 export default function Home() {
   const [showChat, setShowChat] = useState(false);
   const [userName, setUserName] = useState("");
   const [showSpinner, setShowSpinner] = useState(false);
   const [roomId, setRoomId] = useState("");
+  const [generatedRoomId, setGeneratedRoomId] = useState("");
+  const [messages, setMessages] = useState<number>(10); 
+  const [messageCount, setMessageCount] = useState<number>(5); 
+
+  const handleMessageSent = () => {
+    setMessageCount(prevCount => prevCount - 1);
+  };
+
+  const generateUniqueId = () => {
+    let uniqueId = Math.random().toString(36).substring(7);
+    setGeneratedRoomId(uniqueId);
+  };
+
+  const shareRoomID = (id: string) => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Chat App",
+          text: "Join my chat room",
+          url: `https://localhost:3000/share/${id}`,
+        })
+        .then(() => console.log("Successful share"))
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Your browser doesn't support this feature");
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert("Copied to clipboard");
+  };
 
   useEffect(() => {
     let user = localStorage.getItem("user");
@@ -43,7 +79,7 @@ export default function Home() {
       
       {
         !showChat && (
-          <div className="mb-4 flex flex-col justify-center items-center">
+          <div className="mb-4 flex flex-col justify-center items-center min-h-screen">
           <h3 className="text-2xl font-bold mb-4">
             {userName ? `Welcome ${userName}` : "Enter your roomID to join chat"}
           </h3>
@@ -64,16 +100,74 @@ export default function Home() {
             {!showSpinner ? "Join" : "Loading..."}
           </Button>
         </div>
+         
+         {/* generate unique id */}
+          <div className="mb-4">
+          <Button
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+            onClick={generateUniqueId}
+          >
+            Generate Room Id
+          </Button>
+          {
+            generatedRoomId && (
+              <div className="flex justify-center items-center">
+              <p className="text-sm text-gray-500 mt-2">
+                Room Id: <span className="text-gray-800">{generatedRoomId}</span>
+              </p>
+              <span className="text-sm text-gray-500 mt-2 mx-2">|</span>
+              <Copy
+                size={16}
+                className="cursor-pointer"
+                onClick={() => copyToClipboard(generatedRoomId)}
+              />
+               <span className="text-sm text-gray-500 mt-2 mx-2">|</span>
+               {/* share */}
+               <Share
+                size={16}
+                className="cursor-pointer"
+                onClick={() => shareRoomID(generatedRoomId)}
+              />
+              </div>
+
+            )
+          }
+
+            </div>
+         {
+            showSpinner && (
+              <div className="flex justify-center items-center">
+              <Loader2
+                size={64}
+                color="blue"
+                className="text-center animate-spin"
+              />
+              </div>
+            )
+         }
           </div>
         
         )
       }
       
-     
+     {
+        showChat && (
+          <div className="mb-4">
+          <MessageBalance messages={messageCount} />
+         <MessageList onMessageSent={handleMessageSent} />
+         {messageCount === 0 && <UpgradePrompt />}
+          </div>
+        )
+     }
       
          <div className="mb-4">
          <div style={{ display: showChat ? "block" : "none" }}>
-          <ChatPage socket={socket} roomId={roomId} username={userName} />
+          {
+            messageCount > 0 && (
+                <ChatPage onMessageSent={handleMessageSent} socket={socket} roomId={roomId} username={userName} />
+            )
+          }
+        
         </div>
         </div>
         
