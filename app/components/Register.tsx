@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Link from 'next/link';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -16,27 +17,42 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
-        username,
-        password,
-        email,
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          password,
+          email,
+        }),
       });
-
-      console.log(response.data);
-      setTimeout(() => {
+      const data = await response.json();
+      console.log(data);
+      if(data.status === 400 || data.status === 401 || data.status === 500){
+        alert(data.message);
+        setLoading(false);
+        return
+      }
+      if(data.status === 200){
+        setTimeout(() => {
         setLoading(false);
         window.location.href = '/Login';
       }
         , 1000);
-    } catch (error) {
+        alert(data.message);
+      }
+
+      
+    } catch (error:any) {
+      alert(error.message);
         setLoading(false);
       console.error(error);
     }
   };
 
   return ( 
-    <div className=" ">
-      <h2 className="text-2xl font-semibold mb-6">Register</h2>
+    <div className="shadow-lg  bg-white  p-16 rounded">
+      <h2 className="text-2xl font-semibold mb-6">Get started!</h2>
       <div className="mb-4">
         <Input
           type="text"
@@ -75,6 +91,7 @@ const Register = () => {
         </div>
       <Button
         onClick={handleRegister}
+        disabled={loading}
         className="w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
       >
         {
@@ -90,6 +107,33 @@ const Register = () => {
             ) : 'Register'
         }
       </Button>
+      <div className='my-4 h-4' />
+      <p className="text-center text-gray-500 text-xs">
+            &copy;2021 Our Services. All rights reserved.
+            </p>
+            <p className="text-center text-gray-500 text-xs">
+            By continuing, you agree to our User Agreement and Privacy Policy.
+            </p>
+            <h5 className="text-center text-gray-500 text-xs">
+            Have an account?
+             <Link
+            className="text-blue-500  mx-2  hover:text-blue-600 hover:underline"
+           href="/Login">Login</Link>
+            </h5>
+            
+            <h5 className="text-center mx-2 text-gray-500 text-xs">
+            New to Our Services? 
+             <Link
+            className="text-blue-500   hover:text-blue-600 hover:underline"
+           href="/Register">Register</Link>
+            </h5>
+     
+
+<div className="flex my-8 items-center justify-between">
+            <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
+            <Link href="#" className="text-xs text-center uppercase hover:underline">Apply as an Expert</Link>
+            <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
+            </div>
     </div>
   );
 };

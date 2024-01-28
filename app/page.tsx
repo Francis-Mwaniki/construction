@@ -30,14 +30,18 @@ export default function App() {
     <>
     {
       loading && (
-       <LoadingIndicator />
+       <LoadingIndicator
+        key={0}
+        />
       ) 
     }
        <>
        <div className="flex min-h-screen flex-col">
      
 <div className="">
-   <LandingPage />
+   <LandingPage
+   key={1}
+    />
 </div>
      
     </div>

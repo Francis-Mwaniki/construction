@@ -1,30 +1,31 @@
 import React, { SetStateAction, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { debounce, set } from 'lodash';
+import { debounce } from 'lodash';
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { JSX, SVGProps } from "react";
 import { Pencil, Trash } from "lucide-react"
-import LoadingIndicator from './verticalLoader';
+// import LoadingIndicator from './verticalLoader';
 import VerticalLoader from './verticalLoader';
-interface Message {
-  id: string;
-  sender: any;
-    //object 
-  content: string;
+interface IMsgDataTypes {
+  roomId: number | SetStateAction<number>;
+  user: any;
+  msg: string;
+  time: string;
+  id?: any
 }
 
 interface ChatProps {
   roomId: number | SetStateAction<number>;
   username: string | SetStateAction<string>;
   userId: number | SetStateAction<number>;
-  
+  socket: any
+
 }
 
-const Chat = ({ roomId, username, userId }: ChatProps) => {
-  const socket = useRef<Socket>(io('http://localhost:4000')).current;
-  const [messages, setMessages] = useState<Message[]>([]);
+const Chat = ({ roomId, username, userId, socket }: ChatProps) => {
+  // const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -34,184 +35,216 @@ const Chat = ({ roomId, username, userId }: ChatProps) => {
   const [localuser, setLocalUser] = useState('')
   const [hasSent, setHasSent] = useState(false);
 const [sending, setSending] = useState<boolean>(false);
+const [currentMsg, setCurrentMsg] = useState("");
+const [chat, setChat] = useState<IMsgDataTypes[]>([
+  {
+    roomId: 0,
+    user: "Francis",
+    msg: "hello",
+    time: "0.20",
+  },
+]);
 
-  const handleSendMessage = (e: any) => {
-    e.preventDefault()
-    setSending(true)
-    if(inputMessage === ""){
-      return
+const sendData = async (e: React.FormEvent<HTMLFormElement>) => {
+  setSending(true);
+  setIsTyping(false);
+  e.preventDefault();
+  if (currentMsg !== "") {
+    const msgData: IMsgDataTypes = {
+      roomId: roomId,
+      user: username,
+      msg: currentMsg,
+      time: `${new Date(Date.now()).getHours()}:${new Date(
+        Date.now()
+      ).getMinutes()}`,
+    };
+
+      await socket.emit("send_msg", msgData);
+    await socket.emit("msg", msgData);
+
+    socket.on("receive_msg", (data: IMsgDataTypes) => {
+      console.log("Received message:", data);
+      setChat((prevChat) => [...prevChat, data]);
     }
-    socket.emit('chatMessage', inputMessage, userId, roomId);
-    socket.emit('typing', username, roomId);
-    setHasSent(true);
+    );
+
+     setTimeout(async () => {
+      setSending(false);
+    }
+      , 100);
+
+  
+
+    setCurrentMsg("");
+  }
+};
+
+ 
+
+  // const handleSendMessage = (e: any) => {
+  //   e.preventDefault()
+  //   setSending(true)
+  //   if(inputMessage === ""){
+  //     return
+  //   }
+  //   socket.emit('chatMessage', inputMessage, userId, roomId);
+  //   socket.emit('typing', username, roomId);
+  //   setHasSent(true);
 
 
-    // socket.on('chatMessage', (message: Message) => {
-    //   console.log("------------------logs 1-----------------");
+  //   // socket.on('chatMessage', (message: Message) => {
+  //   //   console.log("------------------logs 1-----------------");
       
-    //   console.log(message);
+  //   //   console.log(message);
 
-    //     debouncedSetMessages(message);
-    // }
-    // );
-    setTimeout(async () => {
+  //   //     debouncedSetMessages(message);
+  //   // }
+  //   // );
+  //   setTimeout(async () => {
 
-      setSending(false)
-    }
-      , 3000);
-    setInputMessage(''); // Clear the input field after sending the message
-  };
+  //     setSending(false)
+  //   }
+  //     , 3000);
+  //   setInputMessage(''); // Clear the input field after sending the message
+  // };
 
   const editMessage = (id: string) => {
-    const message = messages.find((message) => message.id === id);
-    if (message) {
-      setInputMessage(message.content);
-    }
+    // const message = messages.find((message) => message.id === id);
+    // if (message) {
+    //   setInputMessage(message.content);
+    // }
 
-    socket.emit('editMessage', messages.filter((message) => message.id === id));
+    // socket.emit('editMessage', messages.filter((message) => message.id === id));
   };
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault(); // Prevent the default behavior (newline in the input field)
-      handleSendMessage(e); // Call the function to send the message
+    //  sendData(e);
     }
   };
   const deleteFromSocket = (id: string) => {
-    socket.emit('deleteMessage', messages.filter((message) => message.id === id));
+    // socket.emit('deleteMessage', messages.filter((message) => message.id === id));
 
-    /* id */
-    if(id){
-      setMessages(messages.filter((message) => message.id !== id));
-    }
+    // /* id */
+    // if(id){
+    //   setMessages(messages.filter((message) => message.id !== id));
+    // }
 
   }
-  const debouncedSetMessages = debounce((message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
-  }, 300);
+  // const debouncedSetMessages = debounce((message) => {
+  //   setMessages((prevMessages) => [...prevMessages, message]);
+  // }, 300);
 
 //ferch messages from the backend https://localhost:5000/api/auth/messages-rd
-const fetchChatMessagese = async () => {
-  try {
-    const res = await fetch(`http://localhost:5000/api/auth/messages-rd/${roomId}`);
+// const fetchChatMessagese = async () => {
+//   try {
+//     const res = await fetch(`http://localhost:5000/api/auth/messages-rd/${roomId}`);
     
-    if (res.ok) {
-      const data = await res.json();
-      const messagesArray: Message[] = Object.values(data);
+//     if (res.ok) {
+//       const data = await res.json();
+//       const messagesArray: Message[] = Object.values(data);
 
-      setMessages(messagesArray);
-    } else {
-      console.error("Error fetching messages:", res.statusText);
-    }
-  } catch (error: any) {
-    console.error("Error fetching messages:", error.message);
-  }
+//       setMessages(messagesArray);
+//     } else {
+//       console.error("Error fetching messages:", res.statusText);
+//     }
+//   } catch (error: any) {
+//     console.error("Error fetching messages:", error.message);
+//   }
 
 
-}
+// }
 
 /* call fetch after 3 sec every 3 sec */
-useEffect(() => {
-   setInterval(() => {
-    fetchChatMessagese();
-  }, 500);
-  // return () => clearInterval(interval);
-}
-, [
- inputMessage,
 
-]);
 
-  useEffect(() => {
-    if (inputMessage) {
-      socket.emit('typing', username, roomId);
-    }
-  }, [inputMessage, roomId, username]);
+  // useEffect(() => {
+  //   if (inputMessage) {
+  //     socket.emit('typing', username, roomId);
+  //   }
+  // }, [inputMessage, roomId, username]);
 
-  useEffect(() => {
-    socket.on('typing', (username) => {
-      setIsTyping(true);
-      setTypingUser(username);
-    });
+  // useEffect(() => {
+  //   socket.on('typing', (username) => {
+  //     setIsTyping(true);
+  //     setTypingUser(username);
+  //   });
 
-    // fetchChatMessagese();
-  }, [
-    roomId,
-  ]);
+  // }, [
+  //   roomId,
+  // ]);
 
    // emit fetchChatMessages
      // socket.emit('fetchChatMessages', roomId);
-     useEffect(() => {
-      console.log("------------------logs 2-----------------");
-      socket.on('chatMessage', (message: Message[]) => {
-        console.log("from the backend", message);
-          debouncedSetMessages(message);
-          console.log("debouncedSetMessages", debouncedSetMessages);
+    //  useEffect(() => {
+    //   console.log("------------------logs 2-----------------");
+    //   socket.on('chatMessage', (message: Message[]) => {
+    //     console.log("from the backend", message);
+    //       debouncedSetMessages(message);
+    //       console.log("debouncedSetMessages", debouncedSetMessages);
           
-      });
+    //   });
      
-    }
-    , [
-      roomId,
-      socket,
-    ]);
+    // }
+    // , [
+    //   roomId,
+    //   socket,
+    // ]);
+const getRandomKey = Math.random().toString(36).substring(7);
 
   useEffect(() => {
+
+    
+
     const isUser = localStorage.getItem('user');
     if(isUser){
       setLocalUser(isUser)
     }
 
-    if (!username) {
+    if (!isUser) {
       window.location.href = '/';
       return;
     }
+
+    //log username and roomId to the console
+    console.log("username", username, "roomId", roomId, "chat", chat);
     let isMounted = true;
+
     socket.on('connect', () => {
-      console.log('connected');
+      console.log('-- connected --');
       setIsConnected(true);
-
-
-   
+    
+      // Listen for "receive_msg" event
+      socket.on("receive_msg", (data: IMsgDataTypes) => {
+        console.log("Received message:", data);
+        setChat((prevChat) => [...prevChat, data]);
+      });
+    
+      // Listen for "msg" event
+      socket.on("msg", (data: IMsgDataTypes) => {
+        console.log("Received message:", data);
+        setChat((prevChat) => [...prevChat, data]);
+      });
     });
+    
+   
 
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', (reason: any) => {
       console.log(`Disconnected from the server. Reason: ${reason}`);
       setIsConnected(false);
     });
-    // emit disconnect
-    // socket.emit('disconnect', roomId, userId);
-
-    socket.on('connect_error', (err) => {
-      console.log(`connect_error due to ${err.message}`);
-      setIsConnected(false);
-    });
-
-    if (roomId) {
-      socket.emit('join', roomId, username, userId);
-    }
-    
-
-    //join
-    socket.on('join', (data) => {
-      setUser(data);
-      console.log(data);
-      
-    });
-
-
    
-    // socket.on('chatMessage', (message) => {
-    //   console.log(message);
-    //     debouncedSetMessages(message);
-    // });
+ 
     
-  }, [roomId, username, socket]);
+  }, [roomId, username, socket,chat, isConnected]);
 
   return (
     <>
-       {!isConnected && (
-        <div className="absolute top-0  w-full flex items-center justify-center bg-white">
-          <LoadingIndicator />
+       {!isConnected && sending && (
+        <div className="absolute top-0  w-full flex items-center justify-center ">
+          <VerticalLoader
+            key={getRandomKey}
+           />
         </div>
       )}
         <div className="w-full h-full flex flex-col lg:flex-row relative">
@@ -261,26 +294,29 @@ useEffect(() => {
 
             {/* Chat Messages */}
             <div className="flex-1 overflow-auto p-4 space-y-4 ">
-              {/* Chat messages */}
-
-              {messages.map((message) => (
+             
+  
+              {chat.map((data, index) => (
                 <>
                 
-                 <div key={message.id} className={`flex ${message.sender.username === `${localuser}`
-    ? 'justify-start' : 'justify-end'} items-end mb-4`}>
+                 <div key={Date.now() + index
+                  } className={`flex ${data.user === `${localuser}` ? 'justify-start' : 'justify-end'} items-end mb-4`}>
+                 
        <img
-                    src={`https://ui-avatars.com/api/?name=${message.sender.username}`}
+                    src={`https://ui-avatars.com/api/?name=${data.user}`}
                     alt={user}
                     className="w-7 h-7 rounded-full mr-1"
                   />
     <div
-      className={`max-w-xs mx-2 my-2 p-4 rounded-lg ${message.sender === `${localuser}`
+      className={`max-w-xs mx-2 my-2 p-4 rounded-lg ${data.user === `${localuser}`
        ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
     >
       <p className="text-sm flex  flex-col
        min-w-[100px] 
        ">
-        <span>{message.content} - <span className="text-xs text-gray-500">{message.sender.username}</span></span>
+        <span>{data.msg} - <span className="text-xs text-gray-500">{
+          data.user === `${localuser}` ? 'You' : data.user
+        }</span></span>
         <span className="text-[10px]
          text-gray-500">{new Date().toLocaleTimeString()}</span>
 
@@ -291,8 +327,8 @@ useEffect(() => {
           <button 
           className="  gap-x-4 float-end flex justify-end "
           >
-            <Trash onClick={() => deleteFromSocket(message.id)} className="h-5 w-5 " />
-            <Pencil onClick={() => editMessage(message.id)} className="h-5 w-5" />
+            <Trash onClick={() => deleteFromSocket(data.id)} className="h-5 w-5 " />
+            <Pencil onClick={() => editMessage(data.id)} className="h-5 w-5" />
           </button>
       </p>
     </div>
@@ -355,25 +391,27 @@ useEffect(() => {
                 sending && (
                  
                   <p className="text-xs text-gray-800 text-center py-2  rounded w-full min-w-[400px] mb-2">
-                     <VerticalLoader />
+                     <VerticalLoader
+                      key={getRandomKey}
+                      />
                       
                   </p>
                 )
               }
               </div>
 
-              <form className="flex space-x-2">
+              <form className="flex space-x-2" onSubmit={(e) => sendData(e)}>
                 <Input
                  disabled={sending}
-                   value={inputMessage}
-                   onChange={(e) => setInputMessage(e.target.value)}
+                   value={currentMsg}
+                   onChange={(e) => setCurrentMsg(e.target.value)}
                    // enter to send message
-                   onKeyPress={handleKeyPress}
+                  //  onKeyPress={handleKeyPress}
                  className="flex-1" id="message" placeholder={sending ? 'Sending...' : `${username} type a message`}
                   />
                 <Button type="submit"
-                disabled={inputMessage === '' || sending}
-                onClick={(e) => handleSendMessage(e)}
+                disabled={currentMsg === '' || sending}
+                
                 >
                   <ArrowRightIcon className="h-6 w-6" />
                   <span className="sr-only">Send</span>
