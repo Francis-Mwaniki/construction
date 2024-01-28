@@ -47,4 +47,62 @@ model Message {
   chatRoomId Int
 }
 
+// Define a model for the service
+model Service {
+  id                  Int               @id @default(autoincrement())
+  icon                String?           // Adjust the type based on how you store icons
+  title               String
+  description         String
+  providers           ProviderService[]
+  additionalResources AdditionalResource[]
+  serviceRequests     ServiceRequest[]
+
+  
+}
+
+// Define a model for the service request
+model ServiceRequest {
+  id             Int            @id @default(autoincrement())
+  name           String
+  email          String
+  details        String
+  createdAt      DateTime       @default(now())
+  category       ServiceCategory @relation(fields: [categoryId], references: [id])
+  categoryId     Int
+  services       Service[]      // Establish a many-to-many relationship with services
+}
+
+// Define a model for the service category
+model ServiceCategory {
+  id       Int            @id @default(autoincrement())
+  name     String
+  services ServiceRequest[]
+}
+
+// Define a model for the service provider
+model Provider {
+  id      Int               @id @default(autoincrement())
+  name    String
+  services ProviderService[]
+   
+}
+
+// Define an associative entity to represent the relationship between service requests and service providers
+model ProviderService {
+  id                  Int       @id @default(autoincrement())
+  serviceId           Int
+  providerId          Int
+  service             Service   @relation(fields: [serviceId], references: [id])
+  provider            Provider  @relation(fields: [providerId], references: [id])
+}
+
+// Define a model for additional resources (URLs to hosted files)
+model AdditionalResource {
+  id               Int    @id @default(autoincrement())
+  name             String
+  url              String
+  service          Service @relation(fields: [serviceId], references: [id])
+  serviceId        Int
+}
+
 

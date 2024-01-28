@@ -92,7 +92,7 @@ const Register = () => {
       <Button
         onClick={handleRegister}
         disabled={loading}
-        className="w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
+        className="w-full p-2 text-white rounded-md  focus:outline-none"
       >
         {
             loading ? (

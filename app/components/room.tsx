@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { JSX, SVGProps } from "react";
-import {  Pencil, Trash } from "lucide-react"
+import {  ArrowUp, Pencil, Trash } from "lucide-react"
 import VerticalLoader from "../components/verticalLoader"
 import Loader from "../components/loader"
 interface IMsgDataTypes {
@@ -233,7 +233,7 @@ sending ? (
             disabled={currentMsg === '' || sending}
             
             >
-              <ArrowRightIcon className="h-6 w-6" />
+              <ArrowUp className="h-6 w-6" />
               <span className="sr-only">Send</span>
             </Button>
           </form>
