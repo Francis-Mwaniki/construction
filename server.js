@@ -19,24 +19,19 @@ io.on("connection", (socket) => {
     socket.join(roomId);
     console.log(`user with id-${socket.id} joined room - ${roomId}`);
   });
-  socket.on("msg", (data) => {
-    console.log(data, "DATA");
+
+   socket.on("send_msg", (data) => {
+    // console.log(data, "DATA")
     //This will send a message to a specific room ID
-    socket.to(data.roomId).emit("msg", data);
-    // socket.emit("receive_msg", data);
-    socket.broadcast.to(data.roomId).emit("receive_msg", data);
-    console.log("Message sent to room backendd:", data.roomId);
+    // socket.to(data.roomId).emit("receive_msg", data);
+    socket.to(data.roomId).emit("receive_msg", data);
+        socket.to(data.roomId).emit("say_hi");
+    console.log(`user with id-${socket.id} sent message to room - ${data.roomId}`);
+
+
   });
 
-  socket.on("send_msg", (data) => {
-    console.log(data, "DATA");
-    //This will send a message to a specific room ID
-    socket.to(data.roomId).emit("receive_msg", data);
-    socket.to(data.roomId).emit("msg", data)
-    console.log("thi",socket.to(data.roomId).emit("msg", data));
-    // socket.broadcast.to(data.roomId).emit("receive_msg", data);
-    console.log("Message sent to room:", data.roomId);
-  });
+
 
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
