@@ -22,7 +22,7 @@ const LoadingIndicator = ({  duration, colors }: LoadingIndicatorProps) => {
   return (
     <div className="w-64 my-auto h-64 relative">
       <Progress
-        className={`w-full h-full absolute top-0 left-0 rounded-full bg-[${colors[0]}] bg-gradient-to-r from-[${gradientColors}] `}
+        className={`w-full h-full absolute top-0 left-0 rounded-full bg-pink-600 bg-gradient-to-r from-[${gradientColors}] `}
         value={progress}
          
       />

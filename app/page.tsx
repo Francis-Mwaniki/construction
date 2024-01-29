@@ -20,7 +20,7 @@ export default function App() {
     setTimeout(() => {
       setloading(false);
     }
-      , 4000);
+      , 5000);
 
   
   }, []);

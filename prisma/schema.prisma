@@ -56,6 +56,7 @@ model Service {
   providers           ProviderService[]
   additionalResources AdditionalResource[]
   serviceRequests     ServiceRequest[]
+  serviceProviders    ServiceProvider[]
 
   
 }
@@ -84,6 +85,7 @@ model Provider {
   id      Int               @id @default(autoincrement())
   name    String
   services ProviderService[]
+
    
 }
 
@@ -104,5 +106,31 @@ model AdditionalResource {
   service          Service @relation(fields: [serviceId], references: [id])
   serviceId        Int
 }
+model ServiceProvider {
+  id        Int       @id @default(autoincrement())
+  name      String  @default("")
+  projects  Project[] 
+  links     Link[]
+  services  Service @relation(fields: [serviceId], references: [id]) 
+  serviceId Int  @default(1)
+}
+
+model Project {
+  id               Int      @id @default(autoincrement())
+  name             String  @default("")
+  description      String  @default("")
+  serviceProvider  ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+  serviceProviderId Int
+    provider String @default("")
+  
+}
+
+model Link {
+  id              Int      @id @default(autoincrement())
+  url             String  @default("")
+  serviceProvider ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+  serviceProviderId Int
+}
+
 
 

@@ -157,14 +157,6 @@ export default function Component() {
        }
        }
 
-    
-
-    
-
-   
-
-   
-
   return (
     <div className="flex flex-col min-h-screen relative">
       <header className="flex items-center justify-between bg-white opacity-70  px-4 py-5 border-b fixed z-20 top-0 inset-x-0">

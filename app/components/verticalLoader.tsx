@@ -23,7 +23,8 @@ const LoadingIndicator = ({  duration, colors }: LoadingIndicatorProps) => {
     <div className="">
       <Progress
         value={progress}
-         className='w-full h-1 rounded-full'
+        color='pink'
+         className='w-full h-2 rounded-full bg-pink-800'
       />
       {/* show progress */}
       {/* <div className="w-full h- rounded-full flex items-center justify-center">

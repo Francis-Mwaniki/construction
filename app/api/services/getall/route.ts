@@ -7,7 +7,17 @@ const prisma = new PrismaClient();
 // Get all services
 export async function GET(req: Request, res: Response) {
   try {
-    const services = await prisma.service.findMany();
+    const services = await prisma.service.findMany(
+      {
+        include: {
+          serviceProviders: true,
+          providers: true,
+          serviceRequests: true,
+          additionalResources: true,
+        },
+      }
+    );
+    
     return NextResponse.json({
       message: "Services fetched successfully",
       status: 200,
