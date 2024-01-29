@@ -1,13 +1,21 @@
 
 import { Button } from "@/components/ui/button";
-import { KanbanSquare, LucideArrowDownRight, RefreshCcw } from "lucide-react";
+import { KanbanSquare, Loader2, LucideArrowDownRight, RefreshCcw } from "lucide-react";
 import Link from "next/link"
 import Contact from "./contact";
-import { JSX, SVGProps, useState } from "react"
+import { JSX, SVGProps, use, useEffect, useState } from "react"
 
+interface ServiceProps {
 
+    icon: JSX.Element;
+    title: string;
+    description: string;
+  index: number;
+}
 
 export default function Component() {
+    const [allServices, setallServices] = useState <ServiceProps[]>([]);
+    const [fetching, setFetching] = useState<boolean>(false);
     const [picsNames, setpicsNames] = useState<string[]>([
         "Frank",
         "Carter",
@@ -71,6 +79,47 @@ export default function Component() {
           description: 'Our experts provide high-quality masonry services.',
         },
       ];
+
+      /* fetch all services using fetch from api/services/getall */
+      const fetchServices = async () => {
+        try {
+          setFetching(true);
+        const res = await fetch('/api/services/getall');
+        const data = await res.json();
+        if(data.status === 200){
+          console.log("data",data.data);
+          
+          // before setallServices(data.data); i remove string from icon
+           const newData = data.data.map((service:ServiceProps,index:number) => {
+            return {
+              ...service,
+              icon: services[index].icon
+            }
+          }
+          )
+          setallServices(newData);
+          console.log("newData",newData);
+          
+          setFetching(false);
+        }
+        if(data.status === 400 || data.status === 500){
+          alert(data.message);
+          setFetching(false);
+          return;
+        }
+        } catch (error:any) {
+          alert(error.message);
+          setFetching(false);
+          return;
+          
+        }
+      }
+      useEffect( () => {
+         fetchServices();
+      }
+      , [
+        
+      ]);
       const scrollToSection = (id: string) => {
         const section = document.getElementById(id);
         if (section) {
@@ -107,14 +156,6 @@ export default function Component() {
          return
        }
        }
-
-    
-
-    
-
-   
-
-   
 
   return (
     <div className="flex flex-col min-h-screen relative">
@@ -206,19 +247,28 @@ export default function Component() {
               </p>
             </div>
             <div className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-      {services.map((service, index) => (
-        <Link key={Date.now() + index}
-         href={`/services/${encodeURIComponent(service.title)}`}>
-          <div>
-            <div className="flex flex-col items-center space-y-4 transition-shadow duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
-              {service.icon}
-              <h3 className="text-lg font-bold">{service.title}</h3>
-              <p className="text-gray-500 dark:text-gray-400">{service.description}</p>
-            </div>
-          </div>
-        </Link>
-      ))}
+            {allServices.map((service:ServiceProps,index:number) => (
+  <Link key={Date.now() + index} href={`/services/${encodeURIComponent(service.title)}`}>
+    <div>
+      <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 duration-500 shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
+        {service.icon}
+        <h3 className="text-lg font-bold">{service.title}</h3>
+        <p className="text-gray-500 dark:text-gray-400">{service.description}</p>
+      </div>
     </div>
+  </Link>
+))}
+
+
+
+            </div>
+            {fetching && (
+ <div className="flex sm:flex-row  flex-col items-center justify-center space-y-4 text-center mx-auto w-full p-2 flex-grow">
+ <Loader2 className="h-10 w-10 animate-spin" />
+</div>
+
+
+)}
           </div>
         </section>
         <section id="experts-section" className="w-full py-12 md:py-24 lg:py-32">
@@ -236,7 +286,7 @@ export default function Component() {
     <Link key={Date.now() + index}
      href={`/Experts/${encodeURIComponent(name)}`}>
     <div key={Date.now() + index}
-     className="flex flex-col items-center space-y-4 transition-shadow duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
+     className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
       <img
         className="h-24 w-24 rounded-full object-cover"
         src={`https://ui-avatars.com/api/?background=random&name=${name}`}

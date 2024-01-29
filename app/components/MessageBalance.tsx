@@ -8,7 +8,9 @@ interface MessageBalanceProps {
 
 const MessageBalance = ({ messages }: MessageBalanceProps) => {
     return (
-      <div className="bg-gray-200 p-4 rounded-md">
+      <div className="
+      
+      bg-gray-200 p-4 rounded-md">
         <p>Messages Remaining: {messages}</p>
       </div>
     );

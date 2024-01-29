@@ -93,7 +93,7 @@ export default function Home() {
             disabled={showSpinner}
           />
           <Button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+            className=" text-white px-4 py-2 rounded-lg"
             onClick={handleJoin}
             disabled={showSpinner}
           >
@@ -104,7 +104,7 @@ export default function Home() {
          {/* generate unique id */}
           <div className="mb-4">
           <Button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+            className=" text-white px-4 py-2 rounded-lg"
             onClick={generateUniqueId}
           >
             Generate Room Id
