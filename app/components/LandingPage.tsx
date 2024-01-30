@@ -4,6 +4,7 @@ import { KanbanSquare, Loader2, LucideArrowDownRight, RefreshCcw } from "lucide-
 import Link from "next/link"
 import Contact from "./contact";
 import { JSX, SVGProps, use, useEffect, useState } from "react"
+import toast from "react-hot-toast";
 
 interface ServiceProps {
 
@@ -88,7 +89,17 @@ export default function Component() {
         const data = await res.json();
         if(data.status === 200){
           console.log("data",data.data);
-          
+          toast.success(data.message, {
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+          });
           // before setallServices(data.data); i remove string from icon
            const newData = data.data.map((service:ServiceProps,index:number) => {
             return {
@@ -103,12 +114,32 @@ export default function Component() {
           setFetching(false);
         }
         if(data.status === 400 || data.status === 500){
-          alert(data.message);
+          toast.error(data.message, {
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+          });
           setFetching(false);
           return;
         }
         } catch (error:any) {
-          alert(error.message);
+          toast.error(error.message, {
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+          });
           setFetching(false);
           return;
           
