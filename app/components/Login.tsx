@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const router = useRouter();
@@ -27,7 +28,18 @@ const Login = () => {
 
       console.log(response.data);
       if (response.data.status === 400 || response.data.status === 401) {
-        alert(response.data.message);
+        
+        toast.error(response.data.message, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
         setLoading(false);
         return;
       }
@@ -36,6 +48,17 @@ const Login = () => {
       let user : any = response.data.user.username;
       let id = response.data.user.id;
       const roomId = localStorage.getItem('roomId');
+      toast.success('Login Successful', {
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
      
      
       
@@ -48,7 +71,18 @@ const Login = () => {
         router.push('/createRoom');
       
 
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error.response.data.message, {
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
       console.error(error);
         setLoading(false);
     }

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import LandingPage from './components/LandingPage';
 import LoadingIndicator from './components/verticalLoader';
+import ChatButton from './components/chatButton';
 
 
 export default function App() {
@@ -46,6 +47,7 @@ export default function App() {
      
     </div>
        </>
+       <ChatButton />
    
     </>
     

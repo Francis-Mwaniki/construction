@@ -21,6 +21,7 @@ model User {
   chatRooms ChatRoom[]
   // Relation to Message model
   messages  Message[]
+  
 }
 
 model ChatRoom {
@@ -68,17 +69,18 @@ model ServiceRequest {
   email          String
   details        String
   createdAt      DateTime       @default(now())
-  category       ServiceCategory @relation(fields: [categoryId], references: [id])
-  categoryId     Int
   services       Service[]      // Establish a many-to-many relationship with services
+  // serviceId      Int
+  status         String         @default("pending")
+  UpdatedAt      DateTime       @updatedAt
 }
 
 // Define a model for the service category
-model ServiceCategory {
-  id       Int            @id @default(autoincrement())
-  name     String
-  services ServiceRequest[]
-}
+// model ServiceCategory {
+//   id       Int            @id @default(autoincrement())
+//   name     String
+//   // services ServiceRequest[]
+// }
 
 // Define a model for the service provider
 model Provider {

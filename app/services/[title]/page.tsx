@@ -8,6 +8,7 @@ import { ArrowLeft, Loader2, Quote } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import VerticalLoader from "@/app/components/verticalLoader";
+import { Toaster, toast } from 'react-hot-toast';
 type Props = {
     params:{
       title: string;
@@ -40,6 +41,36 @@ export default function Component ({params}:Props) {
     const [decodeTitle, setDecodeTitle] = React.useState<string>("");
     const [allServices, setallServices] = React.useState<Service[]>([]);
     const [fetching, setFetching] = React.useState<boolean>(false);
+    const [name, setName] = React.useState<string>("");
+    const [email, setEmail] = React.useState<string>("");
+    const [details, setDetails] = React.useState<string>("");
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const [servicesId, setServicesId] = React.useState<number>(0);
+    const [userId, setUserId] = React.useState<number>(0);
+
+    React.useEffect(() => {
+
+      if(localStorage.getItem('userId')){
+        setUserId(parseInt(localStorage.getItem('userId') as string));
+      }
+    
+    }
+
+    
+    , [
+      userId]);
+
+      React.useEffect(() => {
+        
+        if(localStorage.getItem('servicesId')){
+          setServicesId(parseInt(localStorage.getItem('servicesId') as string));
+        }
+        
+      }
+      , [
+        servicesId]);
+
+
 
     React.useEffect(() => {
         setDecodeTitle(decodeURIComponent(params.title));
@@ -61,26 +92,148 @@ export default function Component ({params}:Props) {
           
           const data = await res.json();
           if(data.status === 200){
+            toast.success(data.message, {
+              style: {
+                border: '1px solid #713200',
+                padding: '16px',
+                color: '#713200',
+              },
+              iconTheme: {
+                primary: '#713200',
+                secondary: '#FFFAEE',
+              },
+            });
             console.log("data",data);
-            
-         
             setallServices(data.data);
-            console.log("newData",allServices);
+            console.log("allServices here",data.data[0].serviceId);
+            localStorage.setItem('servicesId', JSON.stringify(data.data[0].serviceId));
+           console.log("servicesId",servicesId);
+           
+           
+            
             
             setFetching(false);
           }
           if(data.status === 400 || data.status === 500){
-            alert(data.message);
+            
+            toast.success(data.message, {
+              style: {
+                border: '1px solid #713200',
+                padding: '16px',
+                color: '#713200',
+              },
+              iconTheme: {
+                primary: '#713200',
+                secondary: '#FFFAEE',
+              },
+            });
             setFetching(false);
             return;
           }
           } catch (error:any) {
-            alert(error.message);
+            toast.success(error.message, {
+              style: {
+                border: '1px solid #713200',
+                padding: '16px',
+                color: '#713200',
+              },
+              iconTheme: {
+                primary: '#713200',
+                secondary: '#FFFAEE',
+              },
+            });
             setFetching(false);
             return;
             
           }
         }
+
+        const submitRequest = async (e: React.FormEvent<HTMLFormElement>) => {
+          e.preventDefault();
+          let servicesId = JSON.parse(localStorage.getItem('servicesId')!);
+          console.log("serviceid to be sent",servicesId);
+          
+          
+          if(!name || !email || !details){
+           
+            toast.error("Please fill all fields", {
+              style: {
+                border: '1px solid #713200',
+                padding: '16px',
+                color: '#713200',
+              },
+              iconTheme: {
+                primary: '#713200',
+                secondary: '#FFFAEE',
+              },
+            });
+            return;
+          }
+          try {
+            setLoading(true);
+          const res = await fetch('/api/services/requestservice',{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({name,email,details,
+            servicesId:JSON.parse(localStorage.getItem('servicesId')!)
+              ,userId})
+          });
+          
+          const data = await res.json();
+          if(data.status === 200){
+            toast.success(data.message, {
+              style: {
+                border: '1px solid #713200',
+                padding: '16px',
+                color: '#713200',
+              },
+              iconTheme: {
+                primary: '#713200',
+                secondary: '#FFFAEE',
+              },
+            });
+            console.log("data",data);
+            setLoading(false);
+            setName("");
+            setEmail("");
+            setDetails("");
+          }
+          if(data.status === 400 || data.status === 500){
+            
+            toast.error(data.message, {
+              style: {
+                border: '1px solid #713200',
+                padding: '16px',
+                color: '#713200',
+              },
+              iconTheme: {
+                primary: '#713200',
+                secondary: '#FFFAEE',
+              },
+            });
+            setLoading(false);
+            return;
+          }
+          } catch (error:any) {
+            toast.error(error.message, {
+              style: {
+                border: '1px solid #713200',
+                padding: '16px',
+                color: '#713200',
+              },
+              iconTheme: {
+                primary: '#713200',
+                secondary: '#FFFAEE',
+              },
+            });
+            setLoading(false);
+            return;
+            
+          }
+        }
+
         React.useEffect( () => {
            if(!decodeTitle){
              return;
@@ -212,22 +365,28 @@ export default function Component ({params}:Props) {
         <section className="rounded-lg bg-white shadow-lg dark:bg-gray-800">
           <div className="p-6 space-y-4">
             <h2 className="text-lg font-bold">Request Service</h2>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={(e) => submitRequest(e)}>
               <div className="flex flex-col space-y-1">
                 <Label htmlFor="name">Your Name</Label>
-                <Input id="name" placeholder="John Doe" />
+                <Input id="name" placeholder="John Doe" onChange={(e) => setName(e.target.value)} />
               </div>
               <div className="flex flex-col space-y-1">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" placeholder="john@example.com" type="email" />
+                <Input id="email" placeholder="john@example.com" type="email" onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div className="flex flex-col space-y-1">
                 <Label htmlFor="details">Project Details</Label>
                 <Textarea id="details" placeholder={`I need a ${decodeTitle} service.`}
-                />
+                onChange={(e) => setDetails(e.target.value)} />
               </div>
-              <Button className="w-full" >
-                Submit Request
+              <Button
+              disabled={loading}
+               className="w-full" type="submit">
+               {
+                  loading ? (
+                    <Loader2 className="w-10 h-10   animate-spin" />
+                  ) : "Submit Request"
+               }
               </Button>
             </form>
           </div>
@@ -244,9 +403,12 @@ export default function Component ({params}:Props) {
           </div>
         </section> */}
       </main>
+
       <footer className="p-6 bg-white dark:bg-gray-800">
         <p className="text-center text-gray-600 dark:text-gray-400">© 2024 Our Services. All rights reserved.</p>
       </footer>
+
+    
     </div>
   )
 }

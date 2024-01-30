@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -29,7 +30,17 @@ const Register = () => {
       const data = await response.json();
       console.log(data);
       if(data.status === 400 || data.status === 401 || data.status === 500){
-        alert(data.message);
+        toast.error(data.message, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
         setLoading(false);
         return
       }
@@ -39,12 +50,32 @@ const Register = () => {
         window.location.href = '/Login';
       }
         , 1000);
-        alert(data.message);
+        toast.success(data.message, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
       }
 
       
     } catch (error:any) {
-      alert(error.message);
+      toast.error(error.message, {
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
         setLoading(false);
       console.error(error);
     }
