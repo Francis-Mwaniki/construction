@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import Link from "next/link";
 import VerticalLoader from "@/app/components/verticalLoader";
 import { Toaster, toast } from 'react-hot-toast';
+import ChatButton from "@/app/components/chatButton";
 type Props = {
     params:{
       title: string;
@@ -403,7 +404,7 @@ export default function Component ({params}:Props) {
           </div>
         </section> */}
       </main>
-
+      <ChatButton />
       <footer className="p-6 bg-white dark:bg-gray-800">
         <p className="text-center text-gray-600 dark:text-gray-400">© 2024 Our Services. All rights reserved.</p>
       </footer>

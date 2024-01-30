@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter,Josefin_Sans } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({ subsets: ['latin'] })
-
+const josefin=Josefin_Sans({subsets:['latin']})
 export const metadata: Metadata = {
   title: 'Construction App',
-  description: 'Construction Advosory App',
+  description: 'Construction Advisory App',
 }
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}
+      <body className={josefin.className}>{children}
       <Toaster position="bottom-center"/>
       </body>
       
