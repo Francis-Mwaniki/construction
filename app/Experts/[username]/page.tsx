@@ -3,7 +3,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import React from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+import { Input } from "@/components/ui/input";
 
 type Props = {
     params:{
@@ -12,10 +14,109 @@ type Props = {
   };
 export default function Component ({params}:Props) {
     const [decodeUsername, setDecodeUsername] = React.useState<string>("");
+    const [name, setName] = React.useState<string>("");
+    const [email, setEmail] = React.useState<string>("");
+    const [details, setDetails] = React.useState<string>("");
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const [userId, setUserId] = React.useState<number>(0);
+
+    React.useEffect(() => {
+
+      if(localStorage.getItem('userId')){
+        setUserId(parseInt(localStorage.getItem('userId') as string));
+      }
+    
+    }, []);
     React.useEffect(() => {
         setDecodeUsername(decodeURIComponent(params.username));
     }, [params.username]);
     
+
+    const submitRequest = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      let servicesId = JSON.parse(localStorage.getItem('servicesId')!);
+      console.log("serviceid to be sent",servicesId);
+      
+      
+      if(!name || !email || !details){
+       
+        toast.error("Please fill all fields", {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+        return;
+      }
+      try {
+        setLoading(true);
+      const res = await fetch('/api/services/requestservice',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({name,email,details,
+        servicesId:JSON.parse(localStorage.getItem('servicesId')!)
+          ,userId})
+      });
+      
+      const data = await res.json();
+      if(data.status === 200){
+        toast.success(data.message, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+        console.log("data",data);
+        setLoading(false);
+        setName("");
+        setEmail("");
+        setDetails("");
+      }
+      if(data.status === 400 || data.status === 500){
+        
+        toast.error(data.message, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+        setLoading(false);
+        return;
+      }
+      } catch (error:any) {
+        toast.error(error.message, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+        setLoading(false);
+        return;
+        
+      }
+    }
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <header className="flex items-center justify-between p-6 bg-white dark:bg-gray-800">
@@ -33,13 +134,16 @@ export default function Component ({params}:Props) {
       <main className="flex-1 p-6 space-y-12">
         <section className="rounded-lg bg-white shadow-lg dark:bg-gray-800">
           <div className="p-6 space-y-4">
-            <h2 className="text-xl font-bold">Services Provided</h2>
+            <h2 className="text-xl font-bold">Our Expert
+            {" "}
+            ({decodeUsername})
+            </h2>
             <p className="text-gray-600 dark:text-gray-400">
               Our expert provides high-quality construction services. With a wide range of skills, he is equipped to
               handle a variety of construction projects.
             </p>
             <div className="grid grid-cols-2 gap-4">
-              <img
+              {/* <img
                 alt="Expert profile"
                 className="w-full h-64 object-cover rounded-md"
                 height="100"
@@ -49,7 +153,7 @@ export default function Component ({params}:Props) {
                   objectFit: "cover",
                 }}
                 width="100"
-              />
+              /> */}
               <div className="space-y-2">
                 <h3 className="text-lg font-bold">Expert's Profile</h3>
                 <p className="text-gray-600 dark:text-gray-400">
@@ -90,7 +194,10 @@ export default function Component ({params}:Props) {
               <div>
                 <h3 className="text-lg font-bold">Accreditations</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  John is a certified construction manager and a member of the Construction Management Association. He
+           
+            ({decodeUsername})
+                 {" "}
+                  is a certified construction manager and a member of the Construction Management Association. He
                   also holds a LEED AP certification.
                 </p>
               </div>
@@ -123,19 +230,37 @@ export default function Component ({params}:Props) {
             </div>
           </div>
         </section>
-        <section className="rounded-lg bg-white shadow-lg dark:bg-gray-800">
-          <div className="p-6 space-y-4">
-            <h2 className="text-xl font-bold">Request Services</h2>
-            <p className="text-gray-600 dark:text-gray-400">
+      
+        <section className="rounded-lg bg-white shadow-lg dark:bg-gray-800 mx-auto w-full sm:max-w-xl">
+        <p className="text-gray-600 dark:text-gray-400 p-6 space-y-4">
               To provide the best service, our expert requires detailed information about the project, including the
               scope of work, budget, and timeline. This helps him plan and execute the project efficiently.
             </p>
-            <form className="space-y-4">
+          <div className="p-6 space-y-4">
+            <h2 className="text-lg font-bold">Request Service</h2>
+            <form className="space-y-4" onSubmit={(e) => submitRequest(e)}>
               <div className="flex flex-col space-y-1">
-                <Label htmlFor="projectDetails">Project Details</Label>
-                <Textarea id="projectDetails" placeholder="Describe your project" />
+                <Label htmlFor="name">Your Name</Label>
+                <Input id="name" placeholder={`Your name`} onChange={(e) => setName(e.target.value)} />
               </div>
-              <Button>Request Services</Button>
+              <div className="flex flex-col space-y-1">
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" placeholder="john@example.com" type="email" onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div className="flex flex-col space-y-1">
+                <Label htmlFor="details">Project Details</Label>
+                <Textarea id="details" placeholder={`I need a service.`}
+                onChange={(e) => setDetails(e.target.value)} />
+              </div>
+              <Button
+              disabled={loading}
+               className="w-full" type="submit">
+               {
+                  loading ? (
+                    <Loader2 className="w-10 h-10   animate-spin" />
+                  ) : "Submit Request"
+               }
+              </Button>
             </form>
           </div>
         </section>

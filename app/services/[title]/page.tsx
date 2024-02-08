@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import React from "react";
-import { ArrowLeft, Loader2, Quote } from "lucide-react";
+import { ArrowLeft, ExternalLink, Loader2, Quote } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import VerticalLoader from "@/app/components/verticalLoader";
@@ -275,19 +275,12 @@ export default function Component ({params}:Props) {
           </section>
         <section className="rounded-lg bg-white shadow-lg dark:bg-gray-800">
         {fetching && (
-        <div className="flex items-center text-center justify-center w-full h-full my-auto mx-auto">
+        <div className="flex flex-col items-center text-center justify-center w-full h-full my-auto mx-auto">
           <div>
              <Loader2 className="w-10 h-10  text-gray-700 dark:text-gray-300 animate-spin" />
           </div>
-          <div>
-             <Loader2 className="w-10 h-10  text-gray-700 dark:text-gray-300 animate-spin" />
-          </div>
-          <div>
-             <Loader2 className="w-10 h-10  text-gray-700 dark:text-gray-300 animate-spin" />
-          </div>
-          <div>
-             <Loader2 className="w-10 h-10  text-gray-700 dark:text-gray-300 animate-spin" />
-          </div>
+          {/* loading services */}
+          <span className="text-gray-700 dark:text-gray-300">Loading Services</span>
          
           </div>
       ) }
@@ -295,7 +288,11 @@ export default function Component ({params}:Props) {
    
       {!fetching  && (
         allServices.map((service) => (
-          <Card key={service.id}>
+          <>
+          <h3 className="text-2xl font-bold text-center">
+            Service Details
+          </h3>
+           <Card key={service.id}>
             <CardHeader>
               <CardTitle>{service.name}</CardTitle>
             </CardHeader>
@@ -311,20 +308,28 @@ export default function Component ({params}:Props) {
                 ))}
               </ul>
             </CardContent>
-            <CardFooter className="gap-4 flex  items-center justify-center">
+            <CardFooter className="gap-4 flex  items-center justify-center
+
+            ">
               {
                 service.links.map((link) => (
-                  <Link 
+                  <a 
                   className="bg-black rounded px-5 py-3 text-white
                   hover:bg-gray-800
+                   flex items-center justify-center
                    "
-                  href={link.url} key={link.id}>
+                  href={link.url} key={link.id}
+                  target="_blank" rel="noreferrer"
+                  >
                   <span className=" hover:underline">Visit Website</span>
-                </Link>
+                  <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
                 ))
               }
             </CardFooter>
           </Card>
+          </>
+         
         ))
       )}
     </div>
