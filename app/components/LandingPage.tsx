@@ -114,7 +114,7 @@ export default function Component() {
           setFetching(false);
         }
         if(data.status === 400 || data.status === 500){
-          toast.error(data.message, {
+          toast.error('something went wrong', {
             style: {
               border: '1px solid #713200',
               padding: '16px',
@@ -129,7 +129,7 @@ export default function Component() {
           return;
         }
         } catch (error:any) {
-          toast.error(error.message, {
+          toast.error('Something went wrong',{
             style: {
               border: '1px solid #713200',
               padding: '16px',
@@ -189,27 +189,27 @@ export default function Component() {
        }
 
   return (
-    <div className="flex flex-col min-h-screen relative">
-      <header className="flex items-center justify-between bg-white opacity-70  px-4 py-5 border-b fixed z-20 top-0 inset-x-0">
-        <a onClick={handleClickSection.bind(null,'home-section')}  className="flex items-center gap-2" >
+    <div className="flex flex-col min-h-screen relative overflow-hidden">
+      <header className="flex items-center justify-between bg-white opacity-90  px-4 py-5 border-b fixed z-20 top-0 inset-x-0">
+        <a onClick={handleClickSection.bind(null,'home-section')}  className="flex cursor-pointer items-center gap-2" >
           <ConstructionIcon className="h-6 w-6" />
-          <span className="text-lg font-semibold">ConCorp </span>
+          <span className="text-lg font-semibold">ConSite </span>
         </a>
         <nav className="flex gap-4">
           <a onClick={handleClickSection.bind(null,'experts-section')} 
-           className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " >
+           className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " >
             Experts
           </a>
-          <a onClick={handleClickSection.bind(null,'services-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " >
+          <a onClick={handleClickSection.bind(null,'services-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " >
             Services
           </a>
-          <a onClick={handleClickSection.bind(null,'projects-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " >
-            projects
+          <a onClick={handleClickSection.bind(null,'projects-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " >
+            Projects
           </a>
-          <a onClick={handleClickSection.bind(null,'contact-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " >
+          <a onClick={handleClickSection.bind(null,'contact-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " >
             Contact
           </a>
-          <Link  className="text-sm cursor-pointer sm:text-lg font-medium hover:underline transition-all duration-500 " href="/Login">
+          <Link  className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " href="/Login">
             Login / Register
           </Link>
           
@@ -221,7 +221,7 @@ export default function Component() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Welcome to ConCorp.
+                  Welcome to ConSite.
                 </h1>
                 <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
                   Our experts provide high-quality construction services.
@@ -229,13 +229,13 @@ export default function Component() {
               </div>
               <div className="space-x-4">
                 <Link
-                  className="inline-flex h-9 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+                  className="inline-flex h-9 items-center justify-center rounded-md hover:transition-all bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
                   href="#"
                 >
                   Contact Us
                 </Link>
                 <Link
-                  className="inline-flex h-9 items-center justify-center rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
+                  className="inline-flex h-9 items-center justify-center rounded-md hover:transition-all border border-gray-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
                   href="#"
                 >
                   <span>Learn More</span>
@@ -258,7 +258,7 @@ export default function Component() {
               </div>
               <div className="space-x-4">
                 <Link
-                  className="inline-flex h-9 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+                  className="inline-flex h-9 items-center justify-center rounded-md hover:transition-all bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
                   href="#"
                 >
                   <span>View Projects</span>
@@ -281,7 +281,7 @@ export default function Component() {
             {allServices.map((service:ServiceProps,index:number) => (
   <Link key={Date.now() + index} href={`/services/${encodeURIComponent(service.title)}`}>
     <div>
-      <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 duration-500 shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
+      <div className="container grid items-center rotate-0 hover:rotate-6 transition-all hover:ring-4  hover:ring-neutral-900 hover:scale-125 hover:z-20 hover:opacity-65 hover:bg-white hover:shadow-2xl justify-center gap-4 px-4 text-center md:px-6 duration-500 shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
         {service.icon}
         <h3 className="text-lg font-bold">{service.title}</h3>
         <p className="text-gray-500 dark:text-gray-400">{service.description}</p>
@@ -317,7 +317,7 @@ export default function Component() {
     <Link key={Date.now() + index}
      href={`/Experts/${encodeURIComponent(name)}`}>
     <div key={Date.now() + index}
-     className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
+     className="container grid items-center justify-center gap-4 rotate-0 hover:rotate-6 transition-all hover:ring-4  hover:ring-neutral-900 hover:scale-125 hover:z-20  hover:bg-white hover:shadow-2xl px-4 text-center md:px-6 duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
       <img
         className="h-24 w-24 rounded-full object-cover"
         src={`https://ui-avatars.com/api/?background=random&name=${name}`}
@@ -329,7 +329,7 @@ export default function Component() {
             workTitles[index]
        }
       </p>
-      <button className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-gray-900 text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300">
+      <button className="inline-flex items-center rotate-0 hover:rotate-45    justify-center h-9 w-9 rounded-full bg-gray-900 text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300">
         <svg
             className="h-5 w-5"
             viewBox="0 0 24 24"
@@ -370,7 +370,7 @@ export default function Component() {
             </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 ConCorp . All rights reserved.</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 ConSite . All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link className="text-xs hover:underline underline-offset-4" href="#">
             Terms of Service

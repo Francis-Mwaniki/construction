@@ -162,7 +162,7 @@ const Register = () => {
 
 <div className="flex my-8 items-center justify-between">
             <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
-            <Link href="#" className="text-xs text-center uppercase hover:underline">Apply as an Expert</Link>
+            <Link href="/applyAsExpert" className="text-xs text-center uppercase hover:underline">Apply as an Expert</Link>
             <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
             </div>
     </div>

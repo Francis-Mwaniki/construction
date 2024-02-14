@@ -136,3 +136,29 @@ model Link {
 
 
 
+model Expert {
+  id                 Int      @id @default(autoincrement())
+  firstName          String   @default("")
+  lastName           String   @default("")
+  email              String   @unique
+  certifications     String?  @default("")
+  services           String?  @default("")
+  bio                String?  @default("")
+  password           String   @default("")
+  verifiedWebsites   String[]  @default([])
+  availableDay        String?  @default("")
+  startTime          String?  @default("")
+  endTime            String?  @default("")
+  profilepicURL     String?  @default("") // Store URL instead of local path
+
+  profilepic         File?    // Optional relation to a File model (if needed)
+
+  @@index([email]) // Create an index on the email field for faster lookups
+}
+
+model File { // Optional model for storing profile images
+  id     Int      @id @default(autoincrement())
+  url    String  @unique
+  expert Expert  @relation(fields: [userId], references: [id]) // Replace "user" with "expert"
+  userId Int     @unique
+}

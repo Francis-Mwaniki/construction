@@ -20,7 +20,7 @@ const LoadingIndicator = ({  duration, colors }: LoadingIndicatorProps) => {
   const gradientColors = colors.join(',');
 
   return (
-    <div className="w-64 my-auto h-64 relative">
+    <div className="w-64 my-auto h-64 bg-white relative">
       <Progress
         className={`w-full h-full absolute top-0 left-0 rounded-full bg-pink-600 bg-gradient-to-r from-[${gradientColors}] `}
         value={progress}
@@ -28,7 +28,7 @@ const LoadingIndicator = ({  duration, colors }: LoadingIndicatorProps) => {
       />
       {/* show progress */}
       <div className="w-full h-full absolute top-0 left-0 rounded-full flex items-center justify-center">
-        <div className="text-4xl font-bold text-pink-950">{progress}%</div>
+        <div className="text-4xl font-bold text-gray-300">{progress}%</div>
         </div>
     </div>
   );
@@ -76,7 +76,7 @@ const Load = () => {
 
    
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-white overflow-hidden">
       <LoadingIndicator duration={duration} colors={colors} />
     </div>
   );

@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { JSX, SVGProps } from "react";
-import {  ArrowUp, Pencil, Trash } from "lucide-react"
+import {  ArrowUp, Copy, CopyIcon, LogOut, Pencil, Share, Trash } from "lucide-react"
 import VerticalLoader from "../components/verticalLoader"
 import Loader from "../components/loader"
+import toast from "react-hot-toast";
 interface IMsgDataTypes {
   roomId: string | number;
   user: string;
@@ -24,7 +25,6 @@ const ChatPage = ({ socket, username, roomId , onMessageSent}: RoomProps) => {
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
   const [sending, setSending] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-
   const sendData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSending(true);
@@ -45,6 +45,26 @@ const ChatPage = ({ socket, username, roomId , onMessageSent}: RoomProps) => {
       onMessageSent();
       setCurrentMsg("");
     }
+  };
+  const logout = () => {
+    
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('roomId');
+    localStorage.removeItem('id');
+    window.location.href = '/';
+    toast.success('logged out', {
+      style: {
+        border: '1px solid #713200',
+        padding: '16px',
+        color: '#713200',
+      },
+      iconTheme: {
+        primary: '#713200',
+        secondary: '#FFFAEE',
+      },
+    });
+    
   };
 
   useEffect(() => {
@@ -71,11 +91,13 @@ const ChatPage = ({ socket, username, roomId , onMessageSent}: RoomProps) => {
     <>
     {
       !isConnected && (
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center min-h-screen bg-white">
           <Loader />
         </div>
       )
     }
+    {
+  isConnected && (
     <div className="w-full h-full flex flex-col lg:flex-row relative">
       {/* Aside Section */}
       <aside className="w-full lg:w-[28%] h-full border-r lg:border-r-0 lg:border-b overflow-auto sm:sticky sm:z-20 sm:bg-white  sm:left-0 ">
@@ -87,7 +109,7 @@ const ChatPage = ({ socket, username, roomId , onMessageSent}: RoomProps) => {
           {/* message send list */}
            {
               username
-               ? <li className="flex items-center p-4">
+               && (<li className="flex items-center p-4">
               <img
                 src={`https://ui-avatars.com/api/?background=random&name=${username}`}
                 alt={username}
@@ -95,13 +117,19 @@ const ChatPage = ({ socket, username, roomId , onMessageSent}: RoomProps) => {
               />
               <div>
                 <h3 className="font-bold">{username}</h3>
-                <p className="text-sm text-gray-200 font-bold">
+                <p className="text-sm text-gray-400 font-bold">
                   {username} joined
                 </p>
               </div>
-            </li> : ''
+            </li> )}
+               <li className="flex items-center p-4 hover:transition-all hover:bg-gray-200 cursor-pointer rounded">
+              <a onClick={logout} className="cursor-pointer flex items-center justify-center gap-x-3 mx-3 ">
+                <LogOut className="h-6 w-6 mr-4" />
+                <span className="font-bold">Logout</span>
+              </a>
+            </li>
 
-           }
+           
         </ul>
       </aside>
 
@@ -110,7 +138,29 @@ const ChatPage = ({ socket, username, roomId , onMessageSent}: RoomProps) => {
         {/* Header */}
         <header className="flex items-center justify-between p-4 border-b">
           <h2 className="text-xl font-bold">
-            {roomId ? `Room ${roomId}` : 'Join a room'}
+            {roomId ? (<div className="flex items-center">
+              <span className="mx-2">Room: {roomId}</span>
+              {/* share  */}
+              <button
+                className="flex items-center gap-x-2"
+                onClick={() => {
+                  navigator.clipboard.writeText(roomId);
+                  toast.success("Room ID copied", {
+                    style: {
+                      border: "1px solid #713200",
+                      padding: "16px",
+                      color: "#713200",
+                    },
+                    iconTheme: {
+                      primary: "#713200",
+                      secondary: "#FFFAEE",
+                    },
+                  });
+                }}
+              >
+                <Share className="h-6 w-6" />
+              </button>
+            </div>): 'Join a room'}
           </h2>
           <Button size="icon" variant="outline">
             <XIcon className="h-6 w-6" />
@@ -139,20 +189,20 @@ const ChatPage = ({ socket, username, roomId , onMessageSent}: RoomProps) => {
             
 <div
   className={`max-w-xs mx-2 my-2 p-4 rounded-lg ${user === `${username}`
-   ? 'bg-orange-600 text-white' : 'bg-gray-200 text-black'}`}
+   ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
 >
   <p className="text-sm flex  flex-col
    min-w-[100px] 
    ">
     <span>{msg} - <span className={
-      user === `${username}` ? 'text-gray-200' : 'text-gray-600'
+      user === `${username}` ? 'text-blue-800' : 'text-gray-800'
     }>{' '
     }
       {
       user === `${username}` ? 'You' : user
     }</span></span>
     <span className={
-      user === `${username}` ? 'text-gray-200' : 'text-gray-600'
+      user === `${username}` ? 'text-blue-800' : 'text-gray-800'
     }
     >{new Date().toLocaleTimeString()}</span>
 
@@ -240,6 +290,9 @@ sending ? (
         </div>
       </section>
     </div>
+  )
+    }
+    
   
 
  
