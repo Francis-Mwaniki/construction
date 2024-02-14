@@ -39,7 +39,7 @@ const [send, setSend] = useState(false);
   };
 
   return (
-    <div className="fixed bottom-4 right-4">
+    <div className="fixed bottom-14 right-4">
       <button
         className="w-20 h-20
          bg-black
@@ -57,7 +57,7 @@ const [send, setSend] = useState(false);
         </span>
       </button>
       {isOpen && (
-        <div className="absolute bottom-20 right-4 w-64 p-6 bg-white border border-gray-300 rounded-lg shadow-lg ">
+        <div className="absolute bottom-20 h-96 right-4 w-64 p-2 bg-white border border-gray-300 rounded-lg shadow-lg ">
           {/* Chat Content Goes Here */}
           <div>
           <div className="flex-shrink-0 pt-0.5 justify-center items-center mx-auto flex my-3 ">

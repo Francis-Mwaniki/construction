@@ -190,7 +190,7 @@ export default function Component() {
 
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden">
-      <header className="flex items-center justify-between bg-white opacity-70  px-4 py-5 border-b fixed z-20 top-0 inset-x-0">
+      <header className="flex items-center justify-between bg-white opacity-90  px-4 py-5 border-b fixed z-20 top-0 inset-x-0">
         <a onClick={handleClickSection.bind(null,'home-section')}  className="flex cursor-pointer items-center gap-2" >
           <ConstructionIcon className="h-6 w-6" />
           <span className="text-lg font-semibold">ConSite </span>

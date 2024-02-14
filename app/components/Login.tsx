@@ -168,7 +168,7 @@ const Login = () => {
        
             <div className="flex items-center my-5 justify-between">
             <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
-            <a href="#" className="text-xs text-center  uppercase hover:underline">Login as Expert</a>
+            <a href="loginAsExpert" className="text-xs text-center  uppercase hover:underline">Login as Expert</a>
             <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
             </div>
 
