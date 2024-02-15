@@ -17,8 +17,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={josefin.className}>{children}
-      <Toaster position="bottom-center"/>
+      <body className={josefin.className}>
+        <div>
+          {children}
+        </div>
+         <footer className="bg-gray-800 text-white text-center p-4">
+          <p>&copy; 2024 Francis Consite App</p>
+        </footer>
+      <Toaster/>
       </body>
       
     </html>

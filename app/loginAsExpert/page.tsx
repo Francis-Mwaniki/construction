@@ -34,7 +34,7 @@ const LoginForm  = () => {
         }
         if(data.status === 200){
             setLoading(false);
-          router.push(`/Expert${data.id}`);
+          router.push(`/Experts/${data.id}`);
         }
         
     } catch (error: any) {

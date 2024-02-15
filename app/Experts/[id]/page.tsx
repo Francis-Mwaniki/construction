@@ -429,7 +429,7 @@ const browseImageOnly = (e: any) => {
                 <div className="space-y-2 ">
                   <Label htmlFor="name">Name</Label>
                   <Input
-                  value={user?.firstName} 
+                  value={user?.firstName + ' ' + user?.lastName}
                    id="name" placeholder="Enter your name" />
                    {
                     /* fetching input skeleton */
@@ -498,12 +498,12 @@ const browseImageOnly = (e: any) => {
                     )
                   }
             
-                  <Label htmlFor="profilePicture">Profile Picture</Label>
+                  {/* <Label htmlFor="profilePicture">Profile Picture</Label>
                   <Input id="profilePicture"
                     onChange={browseImageOnly}
                    placeholder="Upload your picture" type="file"
                     accept="image/*"
-                    />
+                    /> */}
                 </div>
               </CardContent>
               {/* <CardFooter>

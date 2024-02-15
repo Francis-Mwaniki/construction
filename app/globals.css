@@ -60,3 +60,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+::-webkit-scrollbar {
+  width: 8px; /* Set the width of the scrollbar */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb {
+  background: black; /* Set the color of the scrollbar handle */
+  border-radius: 5px; /* Set the border radius of the scrollbar handle */
+}
+
+/* Handle on drag */
+
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #0000; /* Set the color of the scrollbar track */
+}
+
+/* Corner */

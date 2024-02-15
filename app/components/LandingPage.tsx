@@ -218,8 +218,13 @@ export default function Component() {
         }
       }
       useEffect( () => {
-        fetchExperts();
          fetchServices();
+      }
+      , [
+        
+      ]);
+      useEffect( () => {
+        fetchExperts();
       }
       , [
         
