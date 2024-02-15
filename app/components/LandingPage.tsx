@@ -13,6 +13,22 @@ interface ServiceProps {
     description: string;
   index: number;
 }
+interface Expert {
+  id: number | boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  certifications: string;
+  bio: string;
+  services: string;
+  verifiedWebsites: string[];
+  availableDay: string;
+  startTime: string;
+  endTime: string;
+  profilepicURL: string;
+}
+
 
 export default function Component() {
     const [allServices, setallServices] = useState <ServiceProps[]>([]);
@@ -27,6 +43,7 @@ export default function Component() {
         "William",
         "James",
     ]);
+    const [allExperts, setallExperts] = useState<Expert[]>([]);
     const  [workTitles, setworkTitles] = useState<string[]>([
         "Project Manager",
         "Architect",
@@ -80,6 +97,61 @@ export default function Component() {
           description: 'Our experts provide high-quality masonry services.',
         },
       ];
+
+      // fetch all experts using fetch from api/expert/getAll
+      const fetchExperts = async () => {
+        try {
+          setFetching(true);
+        const res = await fetch('/api/auth/expert/getAll');
+        const data = await res.json();
+        if(data.status === 200){
+          console.log("data",data.data);
+          toast.success(data.message, {
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+          });
+          setallExperts(data.data);
+          setFetching(false);
+        }
+        if(data.status === 400 || data.status === 500){
+          toast.error('something went wrong', {
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+          });
+          setFetching(false);
+          return;
+        }
+        } catch (error:any) {
+          toast.error('Something went wrong',{
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+          });
+          setFetching(false);
+          return;
+          
+        }
+      }
 
       /* fetch all services using fetch from api/services/getall */
       const fetchServices = async () => {
@@ -146,6 +218,7 @@ export default function Component() {
         }
       }
       useEffect( () => {
+        fetchExperts();
          fetchServices();
       }
       , [
@@ -313,20 +386,23 @@ export default function Component() {
               </div>
               <div className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {
-  picsNames.map((name, index) => (
+  allExperts.map((expert:Expert,index:number) => (
+    //id 
     <Link key={Date.now() + index}
-     href={`/Experts/${encodeURIComponent(name)}`}>
+     href={`/Experts/${encodeURIComponent(expert?.id)}`}>
     <div key={Date.now() + index}
      className="container grid items-center justify-center gap-4 rotate-0 hover:rotate-6 transition-all hover:ring-4  hover:ring-neutral-900 hover:scale-125 hover:z-20  hover:bg-white hover:shadow-2xl px-4 text-center md:px-6 duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
       <img
         className="h-24 w-24 rounded-full object-cover"
-        src={`https://ui-avatars.com/api/?background=random&name=${name}`}
+        src={expert.profilepicURL}
         alt="Person"
       />
-      <h3 className="text-lg font-bold">{name}</h3>
+      <h3 className="text-lg font-bold">{
+        expert.firstName + " " + expert.lastName
+      }</h3>
       <p className="text-gray-500 dark:text-gray-400">
        {
-            workTitles[index]
+          expert.bio
        }
       </p>
       <button className="inline-flex items-center rotate-0 hover:rotate-45    justify-center h-9 w-9 rounded-full bg-gray-900 text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300">
@@ -355,13 +431,20 @@ export default function Component() {
                
               </div>
               {/* load more */}
-  <div className="flex  my-4 mx-auto items-center justify-center ">
+  {/* <div className="flex  my-4 mx-auto items-center justify-center ">
     <Button className="bg-gray-900 text-gray-50 hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300">
     <span className="text-sm font-medium">Load More</span>
     <RefreshCcw className="h-5 w-5 ml-2" />
     </Button>
-</div>
+</div> */}
             </div>
+            {fetching && (
+ <div className="flex sm:flex-row  flex-col items-center justify-center space-y-4 text-center mx-auto w-full p-2 flex-grow">
+ <Loader2 className="h-10 w-10 animate-spin" />
+</div>
+
+
+)}
           </div>
         </section>
          {/* contact */}
