@@ -5,6 +5,7 @@ import Link from "next/link"
 import Contact from "./contact";
 import { JSX, SVGProps, use, useEffect, useState } from "react"
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface ServiceProps {
 
@@ -31,6 +32,7 @@ interface Expert {
 
 
 export default function Component() {
+    const router = useRouter();
     const [allServices, setallServices] = useState <ServiceProps[]>([]);
     const [fetching, setFetching] = useState<boolean>(false);
     const [picsNames, setpicsNames] = useState<string[]>([
@@ -97,6 +99,21 @@ export default function Component() {
           description: 'Our experts provide high-quality masonry services.',
         },
       ];
+      const [isExpert, setisExpert] = useState<boolean>(false);
+      const [isUser, setisUser] = useState<boolean>(false);
+
+      useEffect(() => {
+        const isExpert = localStorage.getItem('isExpert');
+        const isUser = localStorage.getItem('isUser');
+        if(isExpert){
+          setisExpert(true);
+        }
+        if(isUser){
+          setisUser(true);
+        }
+      }, [
+        router
+      ])
 
       // fetch all experts using fetch from api/expert/getAll
       const fetchExperts = async () => {
@@ -266,6 +283,14 @@ export default function Component() {
        }
        }
 
+       const useLogout = () => {
+        localStorage.removeItem('isExpert');
+        localStorage.removeItem('isUser');
+        setisExpert(false);
+        setisUser(false);
+        router.push('/');
+      }
+
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden">
       <header className="flex items-center justify-between bg-white opacity-90  px-4 py-5 border-b fixed z-20 top-0 inset-x-0">
@@ -287,9 +312,26 @@ export default function Component() {
           <a onClick={handleClickSection.bind(null,'contact-section')}  className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " >
             Contact
           </a>
-          <Link  className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " href="/Login">
-            Login / Register
-          </Link>
+          <a  className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " href="/Router">
+            Get Started here
+          </a>
+         
+          {
+            /* logout */
+            isExpert && (
+              <a onClick={useLogout} className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " >
+                Logout
+              </a>
+            )
+          }
+          {
+            /* logout */
+            isUser && (
+              <a  onClick={useLogout} className="text-sm cursor-pointer sm:text-lg font-medium hover:transition-all hover:bg-gray-200 rotate-0 hover:rotate-6 rounded-md  px-3 py-2 hover:underline transition-all duration-500 " >
+                Logout
+              </a>
+            )
+          }
           
         </nav>
       </header>

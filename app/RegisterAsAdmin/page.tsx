@@ -1,5 +1,5 @@
 // components/Register.js
-
+"use client";
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
@@ -82,8 +82,9 @@ const Register = () => {
   };
 
   return ( 
-    <div className="shadow-lg  bg-white  p-16 rounded">
-      <h2 className="text-2xl font-semibold mb-6">Get started!</h2>
+    <div className='max-w-md mx-auto mt-16 p-6  rounded-md my-auto    flex justify-center items-center flex-col' >
+  <div className="shadow-lg  bg-white   p-16 rounded">
+      <h2 className="text-2xl font-semibold mb-6">Get started As Admin!</h2>
       <div className="mb-4">
         <Input
           type="text"
@@ -135,7 +136,7 @@ const Register = () => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 />
                 </svg>
-            ) : 'Register'
+            ) : 'Register As Admin(Demo Only)'
         }
       </Button>
       <div className='my-4 h-4' />
@@ -149,30 +150,34 @@ const Register = () => {
             Have an account?
              <Link
             className="text-blue-500  mx-2  hover:text-blue-600 hover:underline"
-           href="/Login">Login</Link>
+           href="/Login">Login as user</Link>
             </h5>
             
             <h5 className="text-center mx-2 text-gray-500 text-xs">
             New to Our Services? 
              <Link
             className="text-blue-500   hover:text-blue-600 hover:underline"
-           href="/Register">Register</Link>
+           href="/Register">Register
+           as user
+           </Link>
+
+           <Link href="/applyAsExpert" className="text-xs text-center text-blue-600 px-3 hover:underline">Apply as an Expert</Link>
+           
             </h5>
      
 
+<div className="flex my-8 items-center justify-between flex-col gap-y-2">
 <div className="flex my-8 items-center justify-between">
             <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
-            <Link href="/applyAsExpert" className="text-xs text-center uppercase hover:underline">Apply as an Expert</Link>
+            <Link href="/LoginAsAdmin" className="text-xs text-center uppercase hover:underline">Login as Admin</Link>
             <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
             </div>
-            <div className="flex my-8 items-center justify-between">
-            <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
-            <Link href="/RegisterAsAdmin" className="text-xs text-center uppercase hover:underline">
-            Register As Admin
-            </Link>
-            <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
-            </div>
+</div>
+
     </div>
+    </div>
+  
+    
   );
 };
 

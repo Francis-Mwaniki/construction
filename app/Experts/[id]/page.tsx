@@ -5,13 +5,13 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { SelectValue, SelectTrigger, SelectItem, SelectContent, Select } from "@/components/ui/select"
-import { JSX, SVGProps, useState } from "react"
+import { JSX, SVGProps, useEffect, useState } from "react"
 import Image from "next/image"
 import React from "react"
 import DeleteComponent from "../../components/DeleteProfile"
 import toast from "react-hot-toast"
 import {useRouter} from "next/navigation"
-import { Verified, X } from "lucide-react"
+import { ArrowRight, Contact2Icon, ExternalLink, Loader2, LogOut, Mail, User, Verified, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 type Props={
@@ -19,13 +19,35 @@ type Props={
     id: number
   }
 }
+interface Service {
+  id: number;
+  name: string;
+  projects: Project[];
+ links: Links[];
+}
+
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  provider: string;
+}
+interface Links {
+  id: number;
+  url : string;
+}
+interface ServiceResponse {
+  status: number;
+  message: string;
+  data: Service[];
+}  
 interface ExpertProfile {
 id : number;
 firstName: string;
 lastName: string;
 email: string;
-certifications: string;
-services: string;
+certifications: string[];
+services: string[];
 bio: string;
 password: string;
 verifiedWebsites: string[];
@@ -33,7 +55,16 @@ availableDay: string;
 startTime: string;
 endTime: string;
 profilepicURL: string;
+projectss: string[];
 
+}
+interface ServiceProps {
+
+  icon: JSX.Element;
+  title: string;
+  description: string;
+index: number;
+id: number;
 }
 export default function Component({params}:Props) {
   const { id } = params
@@ -51,21 +82,344 @@ export default function Component({params}:Props) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
   const [isOnline, setIsOnline] = useState(false)
+  const [service, setServices] = useState<ServiceProps>({
+    icon: <span></span>,
+    title: '',
+    description: '',
+    index: 0,
+    id: 0
+  })
+  const availableHours = Array.from({ length: 10 }, (_, index) => index + 8);
+  const [curatedServices, setCuratedServices] = useState<ServiceProps[]>([])
+  const [isFetchingServices, setFetching] = useState(false)
+  const [isFetchingService, setFetchingService] = useState(false)
+  const [selectedService, setSelectedService] = useState<Service[]>([])
+  const [isExpert, setIsExpert] = useState(false)
+  const [selectedHour, setSelectedHour] = useState<number | null>(null);
+  const [isCheckingHour, setIsCheckingHour] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [user, setUser] = useState<ExpertProfile>({
     id: 0,
     firstName: '',
     lastName: '',
     email: '',
-    certifications: '',
-    services: '',
+    certifications: [],
+    services: [],
     bio: '',
     password: '',
     verifiedWebsites: [],
     availableDay: '',
     startTime: '',
     endTime: '',
-    profilepicURL: ''
+    profilepicURL: '',
+    projectss: []
   })
+  const [newUser, setNewUser] = useState<ExpertProfile>({
+    id: 0,
+    firstName: '',
+    lastName: '',
+    email: '',
+    certifications: [],
+    services: [],
+    bio: '',
+    password: '',
+    verifiedWebsites: [],
+    availableDay: '',
+    startTime: '',
+    endTime: '',
+    profilepicURL: '',
+    projectss: []
+  })
+
+  const handleHourCheck = async (hour: number) => {
+    // /api/auth/expert/check_hour
+    const res = await fetch(`/api/auth/expert/check_hour`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ hour })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      console.log(data.message);
+      toast.success(`${data.message}`, {
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        duration: 4000,
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+        
+      });
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      toast.error(`${data.message}`, {
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        duration: 4000,
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+        
+      });
+    }
+  };
+
+  useEffect(() => {
+    if(selectedHour !== null){
+      setIsCheckingHour(true);
+      handleHourCheck(
+        selectedHour
+      );
+      setTimeout(() => {
+        setIsCheckingHour(false);
+      }, 3000);
+    }
+  }
+  , [
+    selectedHour
+  ]);
+
+ 
+  const handleHourClick = (hour: number ) => {
+    if (selectedHour !== hour) {
+      setSelectedHour(hour);
+    } else {
+      // If the same hour is clicked again, unselect it
+      setSelectedHour(null);
+    }
+  }
+
+
+  const updateProfile = async (e: any) => {
+    e.preventDefault();
+    // /api/auth/expert/updateProfile
+    setIsUpdating(true);
+    const res = await fetch(`/api/auth/expert/updateProfile`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsUpdating(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsUpdating(false);
+      console.log(data.message);
+    }
+  };
+  
+  /* logout */
+  const logout = async () => {
+    try {
+      localStorage.removeItem('isExpert');
+      localStorage.removeItem('user');
+      router.push('/Login');
+    } catch (error:any) {
+      toast.error('Something went wrong',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+  }
+
+
+  useEffect(() => {
+    if (localStorage.getItem('isExpert')) {
+      setIsExpert(true);
+    }
+  }
+  , [
+    router
+  ]);
+
+     /* fetch all services using fetch from api/services/getall */
+     const fetchServices = async () => {
+      try {
+        setFetching(true);
+      const res = await fetch('/api/services/getall');
+      const data = await res.json();
+      if(data.status === 200){
+        console.log("data",data.data);
+  
+        // before setCuratedServices(data.data); i remove string from icon
+         const newData = data.data.map((service:ServiceProps,index:number) => {
+          return {
+            ...service,
+            icon: <span>{service.icon}</span>
+          }
+        }
+        )
+        setCuratedServices(newData);
+        console.log("newData",newData);
+        
+        setFetching(false);
+      }
+      if(data.status === 400 || data.status === 500){
+        toast.error('something went wrong', {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+        setFetching(false);
+        return;
+      }
+      } catch (error:any) {
+        toast.error('Something went wrong',{
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+        setFetching(false);
+        return;
+        
+      }
+    }
+
+    //fetch  service selected by user -use id to fetch service
+    const fetchService = async (id : number) => {
+      if(!id){
+        return;
+      }
+      setFetchingService(true);
+      try {
+        const url = `/api/services/getserviceById`;
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id:id })
+        }
+
+       
+      const res = await fetch(url,options);
+      const data = await res.json();
+      if(data.status === 200){
+        console.log("data",data.data);
+        setSelectedService(data.data);
+        setFetchingService(false);
+
+      }
+      if(data.status === 400 || data.status === 500){
+        toast.error('something went wrong', {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+        setFetchingService(false);
+        return;
+      }
+      } catch (error:any) {
+        toast.error('Something went wrong',{
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+        setFetchingService(false);
+        return;
+        
+      }
+    }
+
+    useEffect( () => {
+     
+    }
+    , [
+      service
+    ]);
+
+    useEffect( () => {
+       fetchServices();
+    }
+    , [
+      
+    ]);
   const [localUserData, setLocalUserData] = useState('')
   const [image, setImage] = useState('')
   const handleZoom = () => {
@@ -132,7 +486,6 @@ const browseImageOnly = (e: any) => {
       setIsUploading(false);
       console.log(data.message);
       setTimeout(() => {
-        new Audio('/soundplan.wav').play()
         toast.success('Nice profile kudos!', {
           style: {
             border: '1px solid #713200',
@@ -353,9 +706,48 @@ const browseImageOnly = (e: any) => {
       </header>
       <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] bg-gray-100/40 flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10 dark:bg-gray-800/40">
         <div className="max-w-6xl w-full mx-auto grid gap-2 relative">
-          <h1 className="font-semibold text-3xl">
+          <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-xl">
             Expert Profile
-          </h1>
+            {
+              isExpert && (
+                <span className="text-sm font-normal text-gray-500 dark:text-gray-400 px-2">(Expert View Only)</span>
+              )
+            }
+            {
+              !isExpert && (
+                <span className="text-sm font-normal text-gray-500 dark:text-gray-400 px-2">(
+                  <a className="text-blue-500 dark:text-blue-300 hover:underline" href="/loginAsExpert">
+                   Login as Expert
+                  </a>
+                  { ' '}
+                  to view expert profile
+                )</span>
+              )
+            }
+          </h2>
+          {
+            isExpert && (
+              <div className="flex items-center justify-end gap-4">
+               Logged in as {user?.email}
+              </div>
+            )
+          }
+          {/* isExpert logout */}
+          {
+            isExpert && (
+              <div className="flex items-center justify-end gap-4">
+                <a onClick={logout}>
+                  <Button className="flex items-center gap-2">
+                    <span>Logout</span>
+                    <LogOut className="w-5 h-5" />
+                  </Button>
+                </a>
+               
+              </div>
+            )
+          }
+          </div>
         </div>
       
         <div className="grid md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr] items-start gap-6 max-w-6xl w-full mx-auto">
@@ -410,102 +802,182 @@ const browseImageOnly = (e: any) => {
           </div>
           
         </div>
-                <CardTitle>Expert Credentials</CardTitle>
+               
+              </CardHeader>
+             {
+              isExpert && (
+                <Card className="p-2 border border-gray-200 m-2">
+
+                  <CardTitle>Expert Credentials</CardTitle>
                 
                 <CardDescription>Update your profile information.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 ">
-              {
-                      user?.id && (
-                        <span className=" my-7">
-                           <Badge className="bg-green-500 inline-flex items-center gap-1">
-                              <span>Verified</span>
-                              <Verified className="w-5 h-5 text-white" />
-                           </Badge>
-                        </span>
-                      )
-                   }
-              
-                <div className="space-y-2 ">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                  value={user?.firstName + ' ' + user?.lastName}
-                   id="name" placeholder="Enter your name" />
-                   {
-                    /* fetching input skeleton */
-                    !user?.firstName && (
-                      <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
-                    )
-                   }
+                <CardContent className="space-y-4 ">
+                {
+                        user?.id && (
+                          <span className=" my-7">
+                             <Badge className="bg-green-500 inline-flex items-center gap-1">
+                                <span>Verified</span>
+                                <Verified className="w-5 h-5 text-white" />
+                             </Badge>
+                          </span>
+                        )
+                     }
                 
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                  value={user?.email }
-                   id="email" placeholder="Enter your email" type="email" />
-                   {
-                     /* fetching input skeleton */
-                      !user?.email && (
+                <form className="space-y-4" onSubmit={updateProfile}>
+                  <div className="space-y-2 gap-x-3 flex-row gap-y-2 flex  justify-start  items-start ">
+                    <Label htmlFor="name">Full Name</Label>
+                    {/* accept new value */}
+                    <div>
+                <Input
+                 value={newUser.firstName ? newUser.firstName : user?.firstName}
+                  id="name" placeholder={user?.firstName}
+                  type="text"
+                  onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value})}
+                />
+                    </div>
+                    <div>
+                      <Input 
+                      value={newUser.lastName ? newUser.lastName : user?.lastName}
+                      id="name" placeholder={user?.lastName}
+                      type="text"
+                      onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value})}
+                      />
+                    </div>
+                   
+                     
+                     {
+                      /* fetching input skeleton */
+                      !user?.firstName && (
                         <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
                       )
-                   }
-                </div>
-               
-                <div className="space-y-2">
-                  {
-                    /* is uploading */
-                    isUploading && (
-                      /* loading progress */
-                      <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse">
-                        <span className="text-gray-500">{uploadProgress}%</span>
-                      </div>
-                    )
-                  }
-                  {
-                    /* is uploading error */
-                    isUploadingError && (
-                      <span className="text-red-500">{uploadErrorMessage}</span>
-                    )
-                  }
-                  {
-                    /* is uploading success */
-                    isUploadingSuccess && (
-                      <span className="text-green-500">{uploadSuccessMessage}</span>
-                    )
-                  }
-                  {
-                    /* preview */
-                    previewImg && (
-                      <div className="relative w-40 mx-auto h-40">
-                        <Image
-                          src={previewImg.toString()}
-                          alt=""
-                          onClick={handlePreviewZoom}
-                          layout="fill"
-                          objectFit="contain"
-                          className="w-40 h-40 rounded-full ring-4 ring-blue-700 cursor-pointer
-                          object-cover object-center
-                border-2 border-blue-200 dark:border-blue-800
-                transition duration-300 ease-in-out
-                  dark:ring-blue-800
-                hover:scale-105 hover:rotate-90
-                transform hover:shadow-xl
+                     }
+                  
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                    value={newUser.email ? newUser.email : user?.email}
+                    placeholder={user?.email}
+                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                     id="email" type="email" />
+                     {
+                       /* fetching input skeleton */
+                        !user?.email && (
+                          <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
+                        )
+                     }
+                  </div>
+                 
+                  <div className="space-y-2">
+                    {
+                      /* is uploading */
+                      isUploading && (
+                        /* loading progress */
+                        <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse">
+                          <span className="text-gray-500">{uploadProgress}%</span>
+                        </div>
+                      )
+                    }
+                    {
+                      /* is uploading error */
+                      isUploadingError && (
+                        <span className="text-red-500">{uploadErrorMessage}</span>
+                      )
+                    }
+                    {
+                      /* is uploading success */
+                      isUploadingSuccess && (
+                        <span className="text-green-500">{uploadSuccessMessage}</span>
+                      )
+                    }
+                    {
+                      /* preview */
+                      previewImg && (
+                        <div className="relative w-40 mx-auto h-40">
+                          <Image
+                            src={previewImg.toString()}
+                            alt=""
+                            onClick={handlePreviewZoom}
+                            layout="fill"
+                            objectFit="contain"
+                            className="w-40 h-40 rounded-full ring-4 ring-blue-700 cursor-pointer
+                            object-cover object-center
+                  border-2 border-blue-200 dark:border-blue-800
+                  transition duration-300 ease-in-out
+                    dark:ring-blue-800
+                  hover:scale-105 hover:rotate-90
+                  transform hover:shadow-xl
+                  
+                            "
+                          />
+                        </div>
+                      )
+                    }
+              
+                    {/* <Label htmlFor="profilePicture">Profile Picture</Label>
+                    <Input id="profilePicture"
+                      onChange={browseImageOnly}
+                     placeholder="Upload your picture" type="file"
+                      accept="image/*"
+                      /> */}
+                  </div>
+                  <div className="space-y-2 flex w-full">
+                    <Button
+                    className=" justify-self-center flex justify-center items-center mx-auto w-full"
+                      type="submit"
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? (<div className="flex items-center justify-center gap-x-2">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Updating...</span>
+                      </div>) : 'Update'}
+                    </Button>
+                    </div>
+                </form>
+                </CardContent> 
+                </Card>
                 
-                          "
-                        />
-                      </div>
-                    )
-                  }
-            
-                  {/* <Label htmlFor="profilePicture">Profile Picture</Label>
-                  <Input id="profilePicture"
-                    onChange={browseImageOnly}
-                   placeholder="Upload your picture" type="file"
-                    accept="image/*"
-                    /> */}
-                </div>
-              </CardContent>
+              )
+             }
+             {
+              !isExpert && (
+                <Card className="p-2 m-2">
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Card className=" p-2 ">
+                        <CardTitle>Name</CardTitle>
+                        <CardDescription className="flex items-start gap-x-2 m-2 justify-start">
+                          <Badge className=" bg-transparent text-black h-5 font-medium hover:bg-transparent text-lg ">
+                          {user?.firstName + ' ' + user?.lastName}
+                          </Badge>
+                          {/* user */}
+                           <span className=" text-black no-underline ">
+                            <User className="w-5 h-5" />
+                          </span>
+                        </CardDescription>
+                      </Card>
+                    </div>
+                    <div className="space-y-2">
+                      <Card className=" p-2 ">
+                        <CardTitle>Email</CardTitle>
+                        <CardDescription className="flex items-start gap-x-2 m-2 justify-start">
+                          <Badge className=" bg-transparent h-5 text-black hover:bg-transparent text-lg font-medium">
+                          {user?.email}
+                          </Badge>
+                          {/* email directly*/}
+                          <a href={`mailto:${user?.email}`} className=" text-black no-underline ">
+                            <Mail className="w-5 h-5" />
+                          </a>
+                        </CardDescription>
+                      </Card>
+                    </div>
+                  
+                  </CardContent>
+                </Card>
+              )
+             }
+              
+             
               {/* <CardFooter>
                 {
                   previewImg && (
@@ -541,49 +1013,89 @@ const browseImageOnly = (e: any) => {
             </Card>
             {/* bio,certification,services */}
             <Card>
-              <CardHeader>
-                <CardTitle>Expert Profile</CardTitle>
-                <CardDescription>Update your profile information.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+             {
+              isExpert && (
+                <CardHeader>
+                  <CardTitle>Expert Credentials</CardTitle>
+                  <CardDescription>Update your profile information.</CardDescription>
+                </CardHeader>
+              )
+             }
+              <CardContent className="space-y-4 my-2">
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                  value={user?.bio}
-                    id="bio" placeholder="Enter your bio" />
-
-                    {
-                      /* fetching input skeleton */
-                      !user?.bio && (
-                        <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse">
-
-                        </div>
-                      )
-                    }
+                  <Card className=" p-2 ">
+                    <CardTitle>Bio</CardTitle>
+                    <CardDescription>
+                      <CardDescription className="  text-black italic    text-sm font-normal">
+                      {user?.bio}
+                      </CardDescription>
+                    </CardDescription>
+                    </Card>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="certification">Certification</Label>
-                  <Input
-                  value={user?.certifications}
-                    id="certification" placeholder="Enter your certification" />
-                    {
-                      /* fetching input skeleton */
-                      !user?.certifications && (
-                        <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
-                      )
-                    }
+                  <Card className=" p-2 ">
+                    <CardTitle>Certifications</CardTitle>
+                    <CardContent>
+                      <div className=" flex justify-start items-start mx-auto flex-col gap-y-3 p-2 ">
+                      {user?.certifications.map((certification) => (
+                        <CardDescription key={certification}>
+                          <span 
+                        className="bg-black text-white p-1 h-2 w-2 rounded-full m-2"
+                        />{certification}</CardDescription>
+                      ))}
+
+                      </div>
+                    </CardContent>
+                    </Card>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="services">Services</Label>
-                  <Input
-                  value={user?.services}
-                    id="services" placeholder="Enter your services" />
-                    {
-                      /* fetching input skeleton */
-                      !user?.services && (
-                        <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
-                      )
-                    }
+                  <Card className=" p-2 ">
+                    <CardTitle>Services</CardTitle>
+                    <CardContent>
+                      <div className=" flex justify-start items-start mx-auto flex-col gap-y-3 p-2 ">
+                      {user?.services.map((service) => (
+                        <CardDescription key={service}>
+                          <span 
+                        className="bg-black text-white p-1 h-2 w-2 rounded-full m-2"
+                        />
+                          {service}</CardDescription>
+                      ))}
+                      </div>
+                    </CardContent>
+                    </Card>
+                </div>
+                {/* projectss */}
+                <div className="space-y-2">
+                  <Card className=" p-2 ">
+                    <CardTitle className="p-2">Projects</CardTitle>
+                    <CardContent>
+                      <div className="flex justify-start items-start mx-auto flex-col gap-y-3 p-2 ">
+                      {user?.projectss.map((projects) => (
+                        <CardDescription key={projects}><span 
+                        className="bg-black text-white p-1 h-2 w-2 rounded-full m-2"
+                        />{projects}</CardDescription>
+                      ))}
+                      </div>
+                    </CardContent>
+                    {/* web site links */}
+                    <CardFooter className="gap-4 flex  items-center justify-center">
+                      {
+                        user?.verifiedWebsites.map((website) => (
+                          <a 
+                          className="bg-black rounded px-5 py-3 text-white
+                          hover:bg-gray-800
+                           flex items-center justify-center
+                           "
+                          href={website} key={website}
+                          target="_blank" rel="noreferrer"
+                          >
+                          <span className=" hover:underline">Visit Website</span>
+                          <ExternalLink className="w-4 h-4 ml-1" />
+                        </a>
+                        ))
+                      }
+                    </CardFooter>
+                    </Card>
                 </div>
               </CardContent>
             </Card>
@@ -591,58 +1103,116 @@ const browseImageOnly = (e: any) => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Availbility</CardTitle>
-                <CardDescription>Set your availbility.</CardDescription>
+                <CardTitle> Expert Availbility</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="day">Day</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <Input
-                        id="day"
-                        placeholder="Select day"
-                        value={user?.availableDay}
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="w-40 p-2">
-                      <SelectItem value="Monday">Monday</SelectItem>
-                      <SelectItem value="Tuesday">Tuesday</SelectItem>
-                      <SelectItem value="Wednesday">Wednesday</SelectItem>
-                      <SelectItem value="Thursday">Thursday</SelectItem>
-                      <SelectItem value="Friday">Friday</SelectItem>
-                      <SelectItem value="Saturday">Saturday</SelectItem>
-                      <SelectItem value="Sunday">Sunday</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Card className=" p-2 ">
+                    <CardDescription>Available Day</CardDescription>
+                    <CardDescription>
+                      <Badge className=" bg-transparent text-black hover:text-blue-600 hover:bg-transparent text-lg font-light">
+                      {user?.availableDay.toLocaleUpperCase()}
+                      </Badge>
+                    </CardDescription>
+                   </Card>
+                </div>
+                <Card className=" p-2 grid gap-4 grid-cols-2 items-center m-auto justify-center">
+                <div className="space-y-2 ">
+                   <Card className="p-2 flex items-center m-auto justify-center ">
+                    <CardDescription className="font-extrabold text-2xl text-center">Start Time</CardDescription>
+                    <CardDescription>
+                      <Badge className=" bg-transparent text-black hover:text-blue-600 hover:bg-transparent text-lg font-light">
+                      {user?.startTime}
+                      </Badge>
+                    </CardDescription>
+                   </Card>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="start">Start Time</Label>
-                  <Input
-                    id="start"
-                    type="text"
-                    value={user?.startTime}
-                    placeholder="Select start time"
-                  />
+                  <Card className=" p-2 flex items-center m-auto justify-center">
+                    <CardDescription className=" font-extrabold text-2xl text-center">End Time</CardDescription>
+                    <CardDescription>
+                      <Badge className=" bg-transparent text-black hover:text-blue-600 hover:bg-transparent text-lg font-light">
+                      {user?.endTime}
+                      </Badge>
+                    </CardDescription>
+                   </Card>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="end">End Time</Label>
-                  <Input
-                    id="end"
-                    type="text"
-                    value={user?.endTime}
-                    placeholder="Select end time"
-                  />
-                </div>
+                </Card>
               </CardContent>
               </Card>
               {/* Book meeeting with expert email,  */}
               <Card>
-              <CardHeader>
+                <Card className="p-2 border border-blue-400">
+                  <CardHeader>
                 <CardTitle>Book Meeting</CardTitle>
                 <CardDescription>Book a meeting with your expert.</CardDescription>
               </CardHeader>
+              
               <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  {/*  */}
+                  <div>
+                  <h2>Select an Hour:</h2>
+                  <div className="flex space-x-4">
+                    {availableHours.map((hour) => (
+                      <button
+                        key={hour}
+                        className={`${
+                          selectedHour === hour ? 'bg-black text-white' : 'bg-gray-200'
+                        } px-4 py-2 my-2 rounded focus:outline-none`}
+                        onClick={() => handleHourClick(hour)}
+                        disabled={selectedHour !== null && selectedHour !== hour}
+                      >
+                        from {hour}:00 to {hour + 1}:00
+                      </button>
+                    ))}
+                  </div>
+                  <p>Selected Hour: {selectedHour !== null ? `${selectedHour}:00` : 'None'}</p>
+                  <Card className="p-2 flex items-center justify-center gap-x-3">
+                    {/* deselect  */}
+                    {/* TODO */}
+                 {
+                    selectedHour !== null && (
+                      <button
+                      className="bg-red-500 text-white px-4 py-2 rounded focus:outline-none"
+                      onClick={() => setSelectedHour(null)}
+                      disabled={selectedHour === null}
+                    >
+                      Deselect
+                    </button>
+                    )
+                 }
+                 {
+                  selectedHour === null && !isCheckingHour && (
+                    <p className="text-red-500">Select an hour to book a meeting</p>
+
+                  )
+                 }
+                 {/* checking hour availability  */}
+                  {
+                    isCheckingHour && (
+                      <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse">
+                        <span className="text-gray-500">
+                          {
+                            isCheckingHour ? 'Checking availabilty...' : 'Checked'
+                          }
+                        </span>
+                      </div>
+                    )
+                  }
+
+                    
+                 </Card>
+                </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Full Name</Label>
+                  <Input
+                    id="full_name"
+                    type="text"
+                    placeholder="Enter your full name"
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -659,58 +1229,135 @@ const browseImageOnly = (e: any) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Button>Book 
+                  <Button className="justify-self-center flex justify-center items-center mx-auto w-full">Book 
                     Meeting
                   </Button>
                 </div>
 
               </CardContent>
+                </Card>
+              
               </Card>
               {/* Recommended services */}
-              <Card>
+              {/* <Card>
               <CardHeader>
                 <CardTitle>Recommended Services</CardTitle>
                 <CardDescription>Get recommended services.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="service">Service</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <Input
-                        id="service"
-                        placeholder="Select service"
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="w-40 p-2">
-                      <SelectItem value="Service 1">Service 1</SelectItem>
-                      <SelectItem value="Service 2">Service 2</SelectItem>
-                      <SelectItem value="Service 3">Service 3</SelectItem>
-                      <SelectItem value="Service 4">Service 4</SelectItem>
-                      <SelectItem value="Service 5">Service 5</SelectItem>
-                    </SelectContent>
-                  </Select>
+                {!isFetchingService  && selectedService.length > 0 && (
+        selectedService.map((service) => (
+          <>
+          <h3 className="text-2xl font-bold text-center">
+            Service Details
+          </h3>
+           <Card key={service.id}>
+            <CardHeader>
+              <CardTitle>{service.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {service.projects.map((project) => (
+                  <li key={project.id}>
+                    <h3 className="
+                     text-xl  p-2 
+                    ">{project.name}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{project.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+            <CardFooter className="gap-4 flex  items-center justify-center
+
+            ">
+              {
+                service.links.map((link) => (
+                  <a 
+                  className="bg-black rounded px-5 py-3 text-white
+                  hover:bg-gray-800
+                   flex items-center justify-center
+                   "
+                  href={link.url} key={link.id}
+                  target="_blank" rel="noreferrer"
+                  >
+                  <span className=" hover:underline">Visit Website</span>
+                  <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
+                ))
+              }
+            </CardFooter>
+          </Card>
+
+         
+          <Link className="
+
+         " href={`/services/${service.name}`}>
+           
+          <Button className="w-full flex items-center justify-center gap-2">
+        <span>    Go to {service.name} Service Page</span>
+        <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+           
+          </Link>
+          </>
+         
+        ))
+      )}
+                {
+                  !isFetchingService && (
+                    <>
+                    <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">Select Your Preferred Services:</label>
+                    <select
+                      value={service.title}
+                      onChange={(e) => setServices(curatedServices[e.target.selectedIndex])}
+                      className="p-2 border border-gray-50 rounded w-full"
+                    >
+                      <option value="">Select a service</option>
+                      {curatedServices.map((service:ServiceProps,index:number) => (
+                        <option key={index} value={service.title}>{service.title}</option>
+                      ))}
+                    </select>
+                  </div>
+                    </>
+                  )
+                }
+                {
+                  isFetchingService && (
+                    <div
+                     className="flex justify-center items-center flex-col gap-2">
+                      <span className="">
+                        <Badge className=" bg-black">Fetching</Badge>
+                      </span>
+                      <Loader2 className="w-10 h-10 text-black animate-spin" />
+                     
+                    </div>
+                  )
+                }
                 </div>
+               
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    placeholder="Enter your message"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Button>Get 
-                    Service
+                  <Button
+                  onClick={() => fetchService(service.id)}
+                  >
+                   {
+                      isFetchingService ? (
+                        <Loader2 size={24} className='animate-spin'/>
+                      ) : 'Get Service'
+                   }
                   </Button>
                 </div>
               </CardContent>
-              </Card>
-              {/* Verified Websites */}
-              {/* Delete Account */}
-            <Card className="border border-red-400 ">
+              </Card> */}
+         
+             
+              {
+                isExpert && (
+                     <Card className="border border-red-400 ">
               <CardHeader>
-                <CardTitle>Delete Account</CardTitle>
-                <CardDescription>Delete your account.</CardDescription>
+                <CardTitle>Deactivate Account</CardTitle>
+                <CardDescription>Deactivate your account.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
               {
@@ -728,7 +1375,7 @@ const browseImageOnly = (e: any) => {
 
                   
                   <span className=" my-7">
-                    <Badge className="bg-red-500">Deleting</Badge>
+                    <Badge className="bg-red-500">Deactivating..</Badge>
                   </span>
                   </>
                 
@@ -736,7 +1383,10 @@ const browseImageOnly = (e: any) => {
               }
               </CardContent>
             
-            </Card>
+            </Card> 
+                )
+              }
+        
           </div>
         </div>
       </main>

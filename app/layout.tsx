@@ -21,10 +21,12 @@ export default function RootLayout({
         <div>
           {children}
         </div>
-         <footer className="bg-gray-800 text-white text-center p-4">
+         <footer className="bg-black text-white text-center p-4">
           <p>&copy; 2024 Francis Consite App</p>
         </footer>
-      <Toaster/>
+      <Toaster 
+      position="bottom-center"
+      />
       </body>
       
     </html>

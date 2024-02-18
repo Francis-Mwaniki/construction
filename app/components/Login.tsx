@@ -48,6 +48,7 @@ const Login = () => {
       let user : any = response.data.user.username;
       let id = response.data.user.id;
       const roomId = localStorage.getItem('roomId');
+      localStorage.setItem('isUser', 'true');
       toast.success('Login Successful', {
         style: {
           border: '1px solid #713200',
@@ -68,7 +69,7 @@ const Login = () => {
         localStorage.setItem('roomId', roomId || generateRoomId());
 
         setLoading(false);
-        router.push('/createRoom');
+        router.push('/');
       
 
     } catch (error: any) {
@@ -169,6 +170,13 @@ const Login = () => {
             <div className="flex items-center my-5 justify-between">
             <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
             <a href="loginAsExpert" className="text-xs text-center  uppercase hover:underline">Login as Expert</a>
+            <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
+            </div>
+            <div className="flex my-8 items-center justify-between">
+            <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
+            <a href="/LoginAsAdmin" className="text-xs text-center uppercase hover:underline">
+            Login As Admin
+            </a>
             <span className="border-b w-1/5 lg:w-1/4 border-black"></span>
             </div>
 
