@@ -146,6 +146,7 @@ model Expert {
   bio                String?  @default("")
   password           String   @default("")
   verifiedWebsites   String[]  @default([])
+  isAccountDeactivated Boolean  @default(false)
   availableDay        String?  @default("")
   startTime          String?  @default("")
   endTime            String?  @default("")

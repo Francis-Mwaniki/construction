@@ -34,8 +34,10 @@ const LoginForm  = () => {
         }
         if(data.status === 200){
           localStorage.setItem('isExpert', 'true');
+          let random = Math.random().toString(36).substring(7);
+          
             setLoading(false);
-          router.push(`/Experts/${data.id}`);
+          router.push(`/Experts/${data.id}?token=${random}`);
         }
         
     } catch (error: any) {

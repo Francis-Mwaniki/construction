@@ -11,7 +11,7 @@ import React from "react"
 import DeleteComponent from "../../components/DeleteProfile"
 import toast from "react-hot-toast"
 import {useRouter} from "next/navigation"
-import { ArrowRight, Contact2Icon, ExternalLink, Loader2, LogOut, Mail, User, Verified, X } from "lucide-react"
+import { ArrowRight, Contact2Icon, Edit2Icon, ExternalLink, Loader2, LogOut, Mail, User, Verified, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 type Props={
@@ -82,6 +82,16 @@ export default function Component({params}:Props) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
   const [isOnline, setIsOnline] = useState(false)
+  const [editBio, setEditBio] = useState(false)
+  const [editCertification, setEditCertification] = useState(false)
+  const [editService, setEditService] = useState(false)
+  const [editProjects, setEditProjects] = useState(false)
+  const [editWebsites, setEditWebsites] = useState(false)
+  const [editDay, setEditDay] = useState(false)
+  const [editStartTime, setEditStartTime] = useState(false)
+  const [editTime, setEditTime] = useState(false)
+  
+
   const [service, setServices] = useState<ServiceProps>({
     icon: <span></span>,
     title: '',
@@ -130,6 +140,8 @@ export default function Component({params}:Props) {
     profilepicURL: '',
     projectss: []
   })
+
+  
 
   const handleHourCheck = async (hour: number) => {
     // /api/auth/expert/check_hour
@@ -210,8 +222,493 @@ export default function Component({params}:Props) {
   }
 
 
+  const updateBio = async (e: any) => {
+    e.preventDefault();
+    // /api/auth/expert/updateProfile
+     if(!newUser.bio){
+      setIsUpdating(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+
+      })
+    
+
+      return
+    }
+    setIsUpdating(true);
+    const res = await fetch(`/api/auth/expert/updateBio`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        bio: newUser.bio
+
+
+       })
+    });
+  
+
+
+
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsUpdating(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsUpdating(false);
+      console.log(data.message);
+    }
+  }
+  
+
+  const updateCertification = async (e: any) => {
+    e.preventDefault();
+    if(!newUser.certifications){
+      setIsUpdating(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+    // /api/auth/expert/updateProfile
+    setIsUpdating(true);
+    const res = await fetch(`/api/auth/expert/updateCertification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        certifications: newUser.certifications
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsUpdating(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsUpdating(false);
+      console.log(data.message);
+    }
+  };
+
+  const updateService = async (e: any) => {
+    e.preventDefault();
+    if(!newUser.services){
+      setIsUpdating(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+    // /api/auth/expert/updateProfile
+    setIsUpdating(true);
+    const res = await fetch(`/api/auth/expert/updateServices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        services: newUser.services
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsUpdating(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsUpdating(false);
+      console.log(data.message);
+    }
+  };
+
+  const updateProjects = async (e: any) => {
+    e.preventDefault();
+    if(!newUser.projectss){
+      setIsUpdating(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+    // /api/auth/expert/updateProfile
+    setIsUpdating(true);
+    const res = await fetch(`/api/auth/expert/updateProjects`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        projectss: newUser.projectss
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsUpdating(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsUpdating(false);
+      console.log(data.message);
+    }
+  };
+
+  const updateWebsites = async (e: any) => {
+
+    e.preventDefault();
+    if(!newUser.verifiedWebsites){
+      setIsUpdating(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+    // /api/auth/expert/updateProfile
+    setIsUpdating(true);
+    const res = await fetch(`/api/auth/expert/updateWebsites`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        verifiedWebsites: newUser.verifiedWebsites
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsUpdating(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsUpdating(false);
+      console.log(data.message);
+    }
+  };
+
+  const updateDay = async (e: any) => {
+    e.preventDefault();
+    if(!newUser.availableDay){
+      setIsUpdating(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+    // /api/auth/expert/updateProfile
+    setIsUpdating(true);
+    const res = await fetch(`/api/auth/expert/updateAvailableDay`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        availableDay: newUser.availableDay
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsUpdating(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsUpdating(false);
+      console.log(data.message);
+    }
+  };
+
+
+  const updateTime = async (e: any) => {
+    e.preventDefault();
+    // /api/auth/expert/updateProfile
+    setIsUpdating(true);
+    if(!newUser.startTime || !newUser.endTime){
+      setIsUpdating(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+
+    const res = await fetch(`/api/auth/expert/updateTime`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        startTime: newUser.startTime,
+        endTime: newUser.endTime
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsUpdating(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsUpdating(false);
+      console.log(data.message);
+    }
+  }
+
   const updateProfile = async (e: any) => {
     e.preventDefault();
+    // email, firstName, lastName
+    if(!newUser.email || !newUser.firstName || !newUser.lastName){
+      setIsUpdating(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
     // /api/auth/expert/updateProfile
     setIsUpdating(true);
     const res = await fetch(`/api/auth/expert/updateProfile`, {
@@ -260,7 +757,49 @@ export default function Component({params}:Props) {
       setIsUpdating(false);
       console.log(data.message);
     }
-  };
+  }
+
+
+
+  const handleCertification = (e: any) => {
+    e.preventDefault();
+    setEditCertification(!editCertification);
+  }
+
+  const handleService = (e: any) => {
+    e.preventDefault();
+    setEditService(!editService);
+  }
+
+  const handleProjects = (e: any) => {
+    e.preventDefault();
+    setEditProjects(!editProjects);
+  }
+
+  const handleWebsites = (e: any) => {
+    e.preventDefault();
+    setEditWebsites(!editWebsites);
+  }
+
+  const handleDay = (e: any) => {
+    e.preventDefault();
+    setEditDay(!editDay);
+  }
+
+  const handleEndTime = (e: any) => {
+    e.preventDefault();
+    setEditTime(!editTime);
+  }
+
+  const handleStartTime = (e: any) => {
+    e.preventDefault();
+    setEditStartTime(!editStartTime);
+  }
+  const handleBio = (e: any) => {
+    e.preventDefault();
+    setEditBio(!editBio);
+  }
+
   
   /* logout */
   const logout = async () => {
@@ -579,8 +1118,24 @@ const browseImageOnly = (e: any) => {
   };
 
   const handleDelete = async () => {
+    if(!user?.email){
+      setIsDeleting(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    
+    }
     setIsDeleting(true);
-    const res = await fetch(`/api/auth/profile/delete_profile`, {
+    const res = await fetch(`/api/auth/expert/delete_profile`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -589,7 +1144,7 @@ const browseImageOnly = (e: any) => {
     });
   
     const data = await res.json();
-    console.log(data);
+    console.log("log",data);
   
     if (data.status === 200) {
       setIsDeleting(false);
@@ -611,7 +1166,7 @@ const browseImageOnly = (e: any) => {
           
         });
         setTimeout(() => {
-         router.push('/Login')
+         router.push('/loginAsExpert')
         }
         , 600)
       }, 4000);
@@ -626,6 +1181,19 @@ const browseImageOnly = (e: any) => {
     ) {
       setIsDeleting(false);
       console.log(data.message);
+      toast.error(`${data.message}`, {
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        duration: 4000,
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+        
+      });
     }
   };
   return (
@@ -814,19 +1382,19 @@ const browseImageOnly = (e: any) => {
                 <CardContent className="space-y-4 ">
                 {
                         user?.id && (
-                          <span className=" my-7">
+                          <div className=" my-7">
                              <Badge className="bg-green-500 inline-flex items-center gap-1">
                                 <span>Verified</span>
                                 <Verified className="w-5 h-5 text-white" />
                              </Badge>
-                          </span>
+                          </div>
                         )
                      }
                 
                 <form className="space-y-4" onSubmit={updateProfile}>
                   <div className="space-y-2 gap-x-3 flex-row gap-y-2 flex  justify-start  items-start ">
                     <Label htmlFor="name">Full Name</Label>
-                    {/* accept new value */}
+                    
                     <div>
                 <Input
                  value={newUser.firstName ? newUser.firstName : user?.firstName}
@@ -1030,6 +1598,42 @@ const browseImageOnly = (e: any) => {
                       {user?.bio}
                       </CardDescription>
                     </CardDescription>
+                    {
+                      isExpert && (
+                        <div className="flex items-center justify-end gap-4">
+                          <Button
+                          onClick={(e) => {
+                          handleBio(e);
+                          }
+                          }
+                          >
+                            <span className="flex items-center gap-x-2 my-2">
+                              <Edit2Icon className="w-5 h-5" />
+                              <span className=" text-xs">edit bio</span>
+                            </span>
+                          </Button>
+                        </div>
+
+
+                      )
+                    }
+                    { 
+                    editBio && (
+                      <div className="space-y-2">
+                        <Textarea
+                        value={newUser.bio ? newUser.bio : user?.bio}
+                        onChange={(e) => setNewUser({ ...newUser, bio: e.target.value })}
+                        />
+                        <Button
+                        onClick={updateBio}
+                        >
+                          {isUpdating ? 'Updating...' : 'Update'}
+                        </Button>
+                      </div>
+                    )
+                    
+                    }
+                    
                     </Card>
                 </div>
                 <div className="space-y-2">
@@ -1046,6 +1650,43 @@ const browseImageOnly = (e: any) => {
 
                       </div>
                     </CardContent>
+                    {
+                      isExpert && (
+                        <div className="flex items-center justify-end gap-4">
+                          <Button
+                          onClick={(e) => {
+                           handleCertification(e);
+                          }
+                          }
+                          >
+                            <span className="flex items-center gap-x-2 my-2">
+                              <Edit2Icon className="w-5 h-5" />
+                              <span className=" text-xs">edit certs</span>
+                            </span>
+                          </Button>
+                        </div>
+                      )
+                    }
+                    {
+                      editCertification && (
+                        <div className="space-y-2">
+                         {
+                            user.certifications.map((certification, index) => (
+                              <Input
+                              key={index}
+                              value={certification}
+                              onChange={(e) => setNewUser({ ...newUser, certifications: [e.target.value] })}
+                              />
+                            ))
+                         }
+                          <Button
+                            onClick={updateCertification}
+                          >
+                            {isUpdating ? 'Updating...' : 'Update'}
+                          </Button>
+                        </div>
+                      )
+                    }
                     </Card>
                 </div>
                 <div className="space-y-2">
@@ -1062,13 +1703,52 @@ const browseImageOnly = (e: any) => {
                       ))}
                       </div>
                     </CardContent>
+                    {
+                      isExpert && (
+                        <div className="flex items-center justify-end gap-4">
+                          <Button
+                          onClick={(e) => {
+                            handleService(e);
+                          }
+                          }
+                          >
+                           <span className="flex items-center gap-x-2 my-2">
+                              <Edit2Icon className="w-5 h-5" />
+                              <span className=" text-xs">edit services</span>
+                            </span>
+                          </Button>
+                        </div>
+                      )
+                    }
+                    {
+                      editService && (
+                        <div className="space-y-2">
+                         {
+                            user.services.map((service, index) => (
+                              <Input
+                              key={index}
+                              value={service}
+                              onChange={(e) => setNewUser({ ...newUser, services: [e.target.value] })}
+                              />
+                            ))
+                         }
+                          <Button
+                            onClick={updateService}
+                          >
+                            {isUpdating ? 'Updating...' : 'Update'}
+                          </Button>
+                        </div>
+                      )
+                    }
                     </Card>
                 </div>
                 {/* projectss */}
                 <div className="space-y-2">
                   <Card className=" p-2 ">
                     <CardTitle className="p-2">Projects</CardTitle>
-                    <CardContent>
+                    {
+                      !editProjects && (<>
+                       <CardContent>
                       <div className="flex justify-start items-start mx-auto flex-col gap-y-3 p-2 ">
                       {user?.projectss.map((projects) => (
                         <CardDescription key={projects}><span 
@@ -1076,10 +1756,53 @@ const browseImageOnly = (e: any) => {
                         />{projects}</CardDescription>
                       ))}
                       </div>
+
                     </CardContent>
+                      </>)
+                    }
+                   
+                    {
+                      isExpert && (
+                        <div className="flex items-center justify-end gap-4">
+                          <Button
+                          onClick={(e) => {
+                          handleProjects(e);
+                          }
+                          }
+                          >
+                           <span className="flex items-center gap-x-2 my-2">
+                              <Edit2Icon className="w-5 h-5" />
+                              <span className=" text-xs">edit projects</span>
+                            </span>
+                          </Button>
+                        </div>
+                      )
+                    }
+                    {
+                      editProjects && (
+                        <div className="space-y-2">
+                          {
+                            user.projectss.map((projects, index) => (
+                              <Input
+                              key={index}
+                              value={projects}
+                              onChange={(e) => setNewUser({ ...newUser, projectss: [e.target.value] })}
+                              />
+                            ))
+                          }
+                          <Button
+                            onClick={updateProjects}
+                          >
+                            {isUpdating ? 'Updating...' : 'Update'}
+                          </Button>
+                        </div>
+                      )
+                    }
                     {/* web site links */}
                     <CardFooter className="gap-4 flex  items-center justify-center">
                       {
+                        !editWebsites && (<>
+                        {
                         user?.verifiedWebsites.map((website) => (
                           <a 
                           className="bg-black rounded px-5 py-3 text-white
@@ -1093,6 +1816,45 @@ const browseImageOnly = (e: any) => {
                           <ExternalLink className="w-4 h-4 ml-1" />
                         </a>
                         ))
+                      }
+                        </>)
+                      }
+                      
+                      {
+                        isExpert && (
+                          <Button
+                          onClick={(e) => {
+                            handleWebsites(e);
+                          }
+                          }
+                          >
+                            <span className="flex items-center gap-x-2 my-2">
+                              <Edit2Icon className="w-5 h-5" />
+                              <span className=" text-xs">edit web</span>
+                            </span>
+                          </Button>
+                        )
+                      }
+                      {
+                        editWebsites && (
+                          <div className="space-y-2">
+                            {
+                              user.verifiedWebsites.map((website, index) => (
+                                <Input
+                                key={index}
+                                value={website}
+                                onChange={(e) => setNewUser({ ...newUser, verifiedWebsites: [e.target.value] })}
+                                />
+                              ))
+
+                            }
+                            <Button
+                              onClick={updateWebsites}
+                            >
+                              {isUpdating ? 'Updating...' : 'Update'}
+                            </Button>
+                          </div>
+                        )
                       }
                     </CardFooter>
                     </Card>
@@ -1108,12 +1870,52 @@ const browseImageOnly = (e: any) => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Card className=" p-2 ">
-                    <CardDescription>Available Day</CardDescription>
+                    {
+                      !editDay && (
+                        <>
+                           <CardDescription>Available Day</CardDescription>
                     <CardDescription>
                       <Badge className=" bg-transparent text-black hover:text-blue-600 hover:bg-transparent text-lg font-light">
                       {user?.availableDay.toLocaleUpperCase()}
                       </Badge>
                     </CardDescription>
+                        </>
+                     
+                      )
+                    }
+                    
+                    {
+                      isExpert && (
+                        <div className="flex items-center justify-end gap-4">
+                          <Button
+                          onClick={(e) => {
+                            handleDay(e);
+                          }
+                          }
+                          >
+                            <span className="flex items-center gap-x-2 my-2">
+                              <Edit2Icon className="w-5 h-5" />
+                              <span className=" text-xs">edit day</span>
+                            </span>
+                          </Button>
+                        </div>
+                      )
+                    }
+                    {
+                      editDay && (
+                        <div className="space-y-2">
+                          <Input
+                          value={newUser.availableDay ? newUser.availableDay : user?.availableDay}
+                          onChange={(e) => setNewUser({ ...newUser, availableDay: e.target.value })}
+                          />
+                          <Button
+                          onClick={updateDay}
+                          >
+                            {isUpdating ? 'Updating...' : 'Update'}
+                          </Button>
+                        </div>
+                      )
+                    }
                    </Card>
                 </div>
                 <Card className=" p-2 grid gap-4 grid-cols-2 items-center m-auto justify-center">
@@ -1137,6 +1939,44 @@ const browseImageOnly = (e: any) => {
                     </CardDescription>
                    </Card>
                 </div>
+                {
+                  isExpert && (
+                    <div className="flex items-center justify-end gap-4">
+                      <Button
+                      onClick={(e) => {
+                        handleEndTime(e);
+                      }
+                      }
+                      >
+                       <span className="flex items-center gap-x-2 my-2">
+                              <Edit2Icon className="w-5 h-5" />
+                              <span className=" text-xs">edit time</span>
+                            </span>
+                      </Button>
+                    </div>
+                  )
+                }
+                {
+                  editTime && (
+                    <div className="space-y-2">
+                      <Input
+                      value={newUser.startTime ? newUser.startTime : user?.startTime}
+                      onChange={(e) => setNewUser({ ...newUser, startTime: e.target.value })}
+                      />
+                      <Input
+                      value={newUser.endTime ? newUser.endTime : user?.endTime}
+                      onChange={(e) => setNewUser({ ...newUser, endTime: e.target.value })}
+                      />
+                      <Button
+                      onClick={updateTime}
+                      >
+                        {isUpdating ? 'Updating...' : 'Update'}
+                      </Button>
+                    </div>
+                  )
+
+                }
+             
                 </Card>
               </CardContent>
               </Card>

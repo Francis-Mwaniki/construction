@@ -13,7 +13,7 @@ const DeleteComponent = ({ onDelete }: DeleteComponentProps) => {
 
   const handleDelete = () => {
     // Check if the confirmation input matches the expected value
-    if (confirmInput === 'DELETE') {
+    if (confirmInput === 'DEACTIVATE') {
       onDelete();
     } else {
       toast.error('Incorrect confirmation input',

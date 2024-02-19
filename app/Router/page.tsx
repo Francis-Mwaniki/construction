@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/resizable"
 
 import React from 'react';
+import { ChevronsDownUp, SeparatorVertical } from 'lucide-react';
 
 
 const RegisterForm = () => {
@@ -53,19 +54,25 @@ const RegisterForm = () => {
 
         {/* Role Selection */}
         <div className="mb-6">
-          <label htmlFor="role" className="block text-sm font-medium text-gray-600 mb-2">
+         <div className='flex flex-row gap-x-2 justify-between items-center '>
+         <label htmlFor="role" className="block text-sm font-medium text-gray-600 mb-2">
             Select Role
           </label>
+          <span >
+            Register
+          </span>
+          </div>
           <select
             id="role"
             name="role"
-            className="w-full p-2 border rounded-md focus:outline-none"
+            className="w-full p-2  border rounded-md focus:outline-none bg-white appearance-auto"
             onChange={(e) => handleRegisterRoleSelection(e.target.value)}
           >
-            <option value="landowner">LandOwner</option>
-            <option value="expert">Expert</option>
-            <option value="admin">Admin</option>
+            <option className=' h-8 appearance-none' value="landowner">LandOwner</option>
+            <option className=' h-8 appearance-none' value="expert">Expert</option>
+            <option className=' h-8 appearance-none' value="admin">Admin</option>
           </select>
+          
         </div>
       </div>
       {/* divider for vertical -or- */}
@@ -80,18 +87,23 @@ const RegisterForm = () => {
 
         {/* Role Selection */}
         <div className="mb-6">
-          <label htmlFor="role" className="block text-sm font-medium text-gray-600 mb-2">
+        <div className='flex flex-row gap-x-2 justify-between items-center '>
+         <label htmlFor="role" className="block text-sm font-medium text-gray-600 mb-2">
             Select Role
           </label>
+          <span >
+            Login
+          </span>
+          </div>
           <select
             id="role"
             name="role"
-            className="w-full p-2 border rounded-md focus:outline-none"
+            className="w-full p-2 border rounded-md focus:outline-none bg-white appearance-auto"
             onChange={(e) => handleLoginRoleSelection(e.target.value)}
           >
-            <option value="landowner">LandOwner</option>
-            <option value="expert">Expert</option>
-            <option value="admin">Admin</option>
+            <option className=' h-8 appearance-none' value="landowner">LandOwner</option>
+            <option className=' h-8 appearance-none' value="expert">Expert</option>
+            <option className=' h-8 appearance-none' value="admin">Admin</option>
           </select>
         </div>
         </div>

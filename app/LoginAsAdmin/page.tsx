@@ -34,8 +34,9 @@ const LoginForm  = () => {
         }
         if(data.status === 200){
           localStorage.setItem('isAdmin', 'true');
+            let random = Math.random().toString(36).substring(7);
             setLoading(false);
-          router.push(`/Admins/${data.id}`);
+          router.push(`/Admins/${data.id}?token=${random}`);
         }
         
     } catch (error: any) {
