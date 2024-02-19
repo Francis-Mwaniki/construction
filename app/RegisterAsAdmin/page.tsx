@@ -18,7 +18,7 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/admin/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -44,24 +44,20 @@ const Register = () => {
         setLoading(false);
         return
       }
-      if(data.status === 200){
-        setTimeout(() => {
-        setLoading(false);
-        window.location.href = '/Login';
-      }
-        , 1000);
-        toast.success(data.message, {
-          style: {
-            border: '1px solid #713200',
-            padding: '16px',
-            color: '#713200',
-          },
-          iconTheme: {
-            primary: '#713200',
-            secondary: '#FFFAEE',
-          },
-        });
-      }
+      setLoading(false);
+      toast.success('Registered successfully', {
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      window.location.href = '/LoginAsAdmin';
+  
 
       
     } catch (error:any) {

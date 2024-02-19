@@ -14,6 +14,7 @@ import {useRouter} from "next/navigation"
 import { ArrowRight, Contact2Icon, Edit2Icon, ExternalLink, Loader2, LogOut, Mail, MapPin, User, Verified, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import Loader from "@/app/components/loader";
 type Props={
   params:{
     id: number
@@ -109,8 +110,8 @@ export default function Component({params}:Props) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [bookingMessage, setBookingMessage] = useState('');
   const [isBooking, setIsBooking] = useState(false);
-  const [isBookingSuccess, setIsBookingSuccess] = useState(false);
-  const [isBookingError, setIsBookingError] = useState(false);
+  const [isBookingSuccess, setIsBookingSuccess] = useState('');
+  const [isBookingError, setIsBookingError] = useState('');
   const [isBookingInfo, setIsBookingInfo] = useState(false);
   const [bookingEmail, setBookingEmail] = useState('');
   const [bookingName, setBookingName] = useState('');
@@ -243,68 +244,132 @@ export default function Component({params}:Props) {
 
   
 
-  const handleHourCheck = async (hour: number) => {
-    // /api/auth/expert/check_hour
-    const res = await fetch(`/api/auth/expert/check_hour`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ hour })
-    });
+  // const handleHourCheck = async (hour: number) => {
+  //   // /api/auth/expert/check_hour
+  //   const res = await fetch(`/api/auth/expert/check_hour`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify({ hour })
+  //   });
 
-    const data = await res.json();
-    console.log(data);
+  //   const data = await res.json();
+  //   console.log(data);
 
-    if (data.status === 200) {
-      console.log(data.message);
-      toast.success(`${data.message}`, {
-        style: {
-          border: '1px solid #713200',
-          padding: '16px',
-          color: '#713200',
-        },
-        duration: 4000,
-        iconTheme: {
-          primary: '#713200',
-          secondary: '#FFFAEE',
-        },
+  //   if (data.status === 200) {
+  //     console.log(data.message);
+  //     toast.success(`${data.message}`, {
+  //       style: {
+  //         border: '1px solid #713200',
+  //         padding: '16px',
+  //         color: '#713200',
+  //       },
+  //       duration: 4000,
+  //       iconTheme: {
+  //         primary: '#713200',
+  //         secondary: '#FFFAEE',
+  //       },
         
-      });
-    }
+  //     });
+  //   }
 
-    if (
-      data.status === 400 ||
-      data.status === 500 ||
-      data.status === 404 ||
-      data.status === 401 ||
-      data.status === 405
-    ) {
-      toast.error(`${data.message}`, {
-        style: {
-          border: '1px solid #713200',
-          padding: '16px',
-          color: '#713200',
-        },
-        duration: 4000,
-        iconTheme: {
-          primary: '#713200',
-          secondary: '#FFFAEE',
-        },
+  //   if (
+  //     data.status === 400 ||
+  //     data.status === 500 ||
+  //     data.status === 404 ||
+  //     data.status === 401 ||
+  //     data.status === 405
+  //   ) {
+  //     toast.error(`${data.message}`, {
+  //       style: {
+  //         border: '1px solid #713200',
+  //         padding: '16px',
+  //         color: '#713200',
+  //       },
+  //       duration: 4000,
+  //       iconTheme: {
+  //         primary: '#713200',
+  //         secondary: '#FFFAEE',
+  //       },
         
-      });
-    }
-  };
+  //     });
+  //   }
+  // };
 
   useEffect(() => {
     if(selectedHour !== null){
       setIsCheckingHour(true);
-      handleHourCheck(
-        selectedHour
-      );
-      setTimeout(() => {
+  
+     // api call to check if the hour is available -api/auth/expert/bookings/precheck
+      const url = `/api/auth/expert/booking/precheck`;
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id:id, hour:selectedHour })
+      }
+      fetch(url,options).then(res => res.json()).then(data => {
+        if(data.status === 200){
+          setIsCheckingHour(false);
+          setIsBookingSuccess(data.message);
+         toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+
+        });
+        setTimeout(() => {
+          setIsBookingSuccess('');
+        }
+        , 4000);
+        }
+        if(data.status === 400 || data.status === 500){
+          setIsCheckingHour(false);
+          setIsBookingError(data.message);
+          toast.error(`${data.message}`, {
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            duration: 4000,
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+            
+          });
+
+          setTimeout(() => {
+            setIsBookingError('');
+          }
+          , 4000);
+        }
+      }
+      ).catch(error => {
         setIsCheckingHour(false);
-      }, 3000);
+        setIsBookingError('Something went wrong');
+        toast.error('Something went wrong',{
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+      });
     }
   }
   , [
@@ -315,6 +380,7 @@ export default function Component({params}:Props) {
   const handleHourClick = (hour: number ) => {
     if (selectedHour !== hour) {
       setSelectedHour(hour);
+       
     } else {
       // If the same hour is clicked again, unselect it
       setSelectedHour(null);
@@ -1301,10 +1367,10 @@ const browseImageOnly = (e: any) => {
     {
       /* fetching skeleton */
       isFetching && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-gray-500 bg-opacity-50">
-          <div className="flex items-center justify-center w-20 h-20">
-            <div className="w-10 h-10 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
-          </div>
+        <div className="">
+          <div className="flex items-center justify-center min-h-screen bg-white">
+          <Loader />
+        </div>
         </div>
       )
     }
@@ -2157,6 +2223,18 @@ const browseImageOnly = (e: any) => {
                   selectedHour === null && !isCheckingHour && (
                     <p className="text-red-500">Select an hour to book a meeting</p>
 
+                  )
+                 }
+                 {
+                  isBookingSuccess !== '' && (
+                    <p className="text-green-500">{
+                      isBookingSuccess 
+                    }</p>
+                  )
+                 }
+                 {
+                  isBookingError !== '' && (
+                    <p className="text-red-500">{isBookingError}</p>
                   )
                  }
                  {/* checking hour availability  */}

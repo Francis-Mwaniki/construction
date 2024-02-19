@@ -20,7 +20,7 @@ const LoginForm  = () => {
 
     try {
         // Send login request to server
-        const response = await fetch('/api/auth/Admin/loginAsAdmin', {
+        const response = await fetch('/api/admin/loginAsAdmin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
@@ -32,12 +32,16 @@ const LoginForm  = () => {
             setLoading(false);
           return
         }
-        if(data.status === 200){
+      setLoading(false);
           localStorage.setItem('isAdmin', 'true');
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('adminId', data.user.id);
+          localStorage.setItem('adminEmail', data.user.email);
             let random = Math.random().toString(36).substring(7);
-            setLoading(false);
-          router.push(`/Admins/${data.id}?token=${random}`);
-        }
+            const token = localStorage.getItem('token');
+            
+          router.push(`/dashboard?${token}?token=${random}`);
+        
         
     } catch (error: any) {
         setLoading(false);

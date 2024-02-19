@@ -23,6 +23,14 @@ model User {
   messages  Message[]
   
 }
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  
+  
+}
 
 model ChatRoom {
   id      Int      @id @default(autoincrement())

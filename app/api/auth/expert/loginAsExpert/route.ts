@@ -44,13 +44,14 @@ export async function POST(req: Request, res: Response) {
         return NextResponse.json({ message: "Invalid email or password", status: 401 });
     }
 
-    const passwordExluded = { ...expert, password: undefined };
     // Log in successful
-    return NextResponse.json({ message: "Logged in successfully", status: 200, id: expert.id, data: passwordExluded });
-
-
+    return NextResponse.json({ message: "Logged in successfully", status: 200, id: expert.id, data: expert });
     }
-    return NextResponse.json({ message: "Invalid email or password or account deactivated", status: 401 });
+
+    const passwordExluded = { ...user, password: undefined };
+    
+    return NextResponse.json({ message: "Invalid email or password or account deactivated",
+  data: passwordExluded, status: 401 });
   
 
   } catch (error: any) {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import crypto from 'crypto';
 
 
 const LoginForm  = () => {
@@ -32,13 +33,13 @@ const LoginForm  = () => {
             setLoading(false);
           return
         }
-        if(data.status === 200){
           localStorage.setItem('isExpert', 'true');
-          let random = Math.random().toString(36).substring(7);
-          
+          localStorage.setItem('token', data.token);
+
+          let random = Math.random().toString(36).substring(7)
             setLoading(false);
-          router.push(`/Experts/${data.id}?token=${random}`);
-        }
+          router.push(`/Experts/${data.id}?/${crypto.randomBytes(32).toString("hex")}?token=${random}`);
+        
         
     } catch (error: any) {
         setLoading(false);

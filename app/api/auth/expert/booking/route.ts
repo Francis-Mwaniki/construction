@@ -1,11 +1,21 @@
 
  import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+//TemplateID:  d-20c6e30370374c6ca63b6f0179ccf14a
+import sendgrid from "@sendgrid/mail";
 
 const prisma = new PrismaClient();
 
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
 // book expert
 export async function POST(req: Request, res: Response) {
+    if(!process.env.SENDGRID_API_KEY) {
+        console.log("SENDGRID_API_KEY is not set");
+        
+        return  NextResponse.json({ message: "Invalid request", 
+        status: 400
+       });
+      }
   try {
     const data = await req.json();
 
@@ -60,6 +70,17 @@ export async function POST(req: Request, res: Response) {
       });
     }
 
+        // Get the current date and time
+        const currentDate = new Date();
+        const currentHour = currentDate.getHours();
+
+        // Reset hour to 0 every 24 hours
+        if (currentHour >= 24) {
+        data.hour = "0";
+        }
+
+
+
 
     // Create booking
     const booking = await prisma.meeting.create({
@@ -82,6 +103,39 @@ export async function POST(req: Request, res: Response) {
         });
     }
 
+
+    const mail = {
+        to: user.email,
+        subject: 'New Booking',
+        from: 'francismwanik254@gmail.com', // Fill it with your validated email on SendGrid account
+        dynamicTemplateData: {
+            name: user.firstName,
+            email: user.email,
+            message: data.message,
+            expertId: data.id,
+            hour: data.hour + ":00" + "-" + (parseInt(data.hour) + 1) + ":00",
+            shareMeetingLink: data.shareMeetingLink,
+            expertName: `${user.firstName} ${user.lastName}`,
+            expertEmail: user.email,
+        },
+        templateId: 'd-20c6e30370374c6ca63b6f0179ccf14a',
+      };
+        try {
+          await sendgrid.send(mail);
+          console.log("email sent");
+          
+        } catch (error: any) {
+          console.error(error);
+          if (error.message) {
+            console.log(error.message);
+            
+            return  NextResponse.json({ message: error.message,
+              status: 500
+             });
+          }
+
+          
+        }
 
 
           

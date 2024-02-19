@@ -441,7 +441,7 @@ export default function Component() {
      className="container grid items-center justify-center gap-4 rotate-0 hover:rotate-6 transition-all hover:ring-4  hover:ring-neutral-900 hover:scale-125 hover:z-20  hover:bg-white hover:shadow-2xl px-4 text-center md:px-6 duration-500  shadow-lg rounded-lg p-3 shadow-gray-200 hover:shadow-gray-400 hover:cursor-pointer">
       <img
         className="h-24 w-24 rounded-full object-cover"
-        src={expert.profilepicURL}
+        src={`https://ui-avatars.com/api/?background=random&name=${expert?.firstName}+${expert?.lastName}`}
         alt="Person"
       />
       <h3 className="text-lg font-bold">{
