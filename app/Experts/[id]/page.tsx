@@ -168,7 +168,7 @@ export default function Component({params}:Props) {
   //fetching all requests booked by user
   const fetchRequests = async () => {
     setIsFetchingRequests(true)
-    const res = await fetch(`/api/auth/expert/requests`, {
+    const res = await fetch(`/api/admin/experts/requests`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -1051,6 +1051,7 @@ export default function Component({params}:Props) {
     if (localStorage.getItem('isExpert')) {
       setIsExpert(true);
     }
+    fetchRequests();
   }
   , [
     router
@@ -1749,7 +1750,11 @@ const browseImageOnly = (e: any) => {
              }
              {
               isExpert && (<>
+              <CardDescription className=" font-extrabold text-2xl justify-center items-center mx-auto flex m-2">
+                All Booking Requests
+              </CardDescription>
               <div className="flex flex-wrap justify-center">
+
                 {requests.map((request) => (
                   <RequestCard key={request.id} request={request} />
                 ))}
@@ -1757,11 +1762,21 @@ const browseImageOnly = (e: any) => {
               </>)
              }
              {
-              isFetchingRequests && (
+              isFetchingRequests && isExpert && (
                 <div className=" flex justify-center items-center mx-auto">
                  <Loader2 className=" animate-spin" size={30} />
                 </div>
               )
+             }
+             {
+              requests.length === 0 && isExpert && (
+                <div className=" flex justify-center items-center mx-auto">
+                  <span className="text-gray-500 dark:text-gray-400">No requests</span>
+                </div>
+              )
+             }
+             {
+
              }
              {
               !isExpert && (

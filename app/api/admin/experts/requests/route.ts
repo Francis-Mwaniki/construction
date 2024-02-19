@@ -16,22 +16,26 @@ export async function POST(req: Request, res: Response) {
     console.log("id",id);
     
 
-    const data = await prisma.meeting.findMany({
+    const data = await prisma.expert.findMany({
         where:{
-            id:id
+            id: parseInt(id)
+        },
+        select:{
+         meetings:true
         }
     })
 
 
-    console.log("data",data);
+    console.log("data",data[0].meetings);
     
      
 
-        //User created successfully and verification email sent to ${email}
-        return  NextResponse.json({ message: "fetched all requests", 
-       status: 201,
-       data:data
-      });
+    if (data.length === 0) {
+      return NextResponse.json({ message: "No meeting found", status: 404 });
+    }
+
+    return NextResponse.json({ data: data[0].meetings
+      , status: 200 });
 
 
   } catch (error: any) {
