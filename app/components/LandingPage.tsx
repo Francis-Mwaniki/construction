@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { KanbanSquare, Loader2, LucideArrowDownRight, RefreshCcw } from "lucide-react";
+import { KanbanSquare, Loader2, LogInIcon, LucideArrowDownRight, RefreshCcw } from "lucide-react";
 import Link from "next/link"
 import Contact from "./contact";
 import { JSX, SVGProps, use, useEffect, useState } from "react"
@@ -478,12 +478,12 @@ export default function Component() {
                
               </div>
               {/* load more */}
-  {/* <div className="flex  my-4 mx-auto items-center justify-center ">
+  <a href="/applyAsExpert" className="flex  my-4 mx-auto items-center justify-center ">
     <Button className="bg-gray-900 text-gray-50 hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300">
-    <span className="text-sm font-medium">Load More</span>
-    <RefreshCcw className="h-5 w-5 ml-2" />
+    <span className="text-sm font-medium">Apply as Expert</span>
+    <LogInIcon className="h-5 w-5 ml-2" />
     </Button>
-</div> */}
+</a>
             </div>
             {fetching && (
  <div className="flex sm:flex-row  flex-col items-center justify-center space-y-4 text-center mx-auto w-full p-2 flex-grow">

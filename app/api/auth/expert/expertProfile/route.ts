@@ -37,6 +37,7 @@ export async function POST(req: Request, res: Response) {
                 endTime: true,
                 profilepicURL: true,
                 projectss: true,
+                location: true,
 
             }
         });

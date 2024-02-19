@@ -11,7 +11,7 @@ import React from "react"
 import DeleteComponent from "../../components/DeleteProfile"
 import toast from "react-hot-toast"
 import {useRouter} from "next/navigation"
-import { ArrowRight, Contact2Icon, Edit2Icon, ExternalLink, Loader2, LogOut, Mail, User, Verified, X } from "lucide-react"
+import { ArrowRight, Contact2Icon, Edit2Icon, ExternalLink, Loader2, LogOut, Mail, MapPin, User, Verified, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 type Props={
@@ -56,6 +56,7 @@ startTime: string;
 endTime: string;
 profilepicURL: string;
 projectss: string[];
+location: string;
 
 }
 interface ServiceProps {
@@ -90,8 +91,6 @@ export default function Component({params}:Props) {
   const [editDay, setEditDay] = useState(false)
   const [editStartTime, setEditStartTime] = useState(false)
   const [editTime, setEditTime] = useState(false)
-  
-
   const [service, setServices] = useState<ServiceProps>({
     icon: <span></span>,
     title: '',
@@ -108,6 +107,14 @@ export default function Component({params}:Props) {
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
   const [isCheckingHour, setIsCheckingHour] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [bookingMessage, setBookingMessage] = useState('');
+  const [isBooking, setIsBooking] = useState(false);
+  const [isBookingSuccess, setIsBookingSuccess] = useState(false);
+  const [isBookingError, setIsBookingError] = useState(false);
+  const [isBookingInfo, setIsBookingInfo] = useState(false);
+  const [bookingEmail, setBookingEmail] = useState('');
+  const [bookingName, setBookingName] = useState('');
+
   const [user, setUser] = useState<ExpertProfile>({
     id: 0,
     firstName: '',
@@ -122,7 +129,8 @@ export default function Component({params}:Props) {
     startTime: '',
     endTime: '',
     profilepicURL: '',
-    projectss: []
+    projectss: [],
+    location: ''
   })
   const [newUser, setNewUser] = useState<ExpertProfile>({
     id: 0,
@@ -138,8 +146,100 @@ export default function Component({params}:Props) {
     startTime: '',
     endTime: '',
     profilepicURL: '',
-    projectss: []
+    projectss: [],
+    location: ''
   })
+
+  const getMeetingLink = () => {
+    const randomString = Math.random().toString(36).substring(7);
+    return `http://localhost:3000/meeting/${randomString}`;
+  }
+
+
+  const handleBooking = async (e: any) => {
+    e.preventDefault();
+    if(!bookingName || !bookingEmail){
+      setIsBooking(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+    // /api/auth/expert/booking
+    setIsBooking(true);
+    const res = await fetch(`/api/auth/expert/booking`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        name: bookingName,
+        email: bookingEmail,
+        message: bookingMessage,
+        hour: selectedHour,
+        expertId: id,
+        expertEmail: user.email,
+        expertName: `${user.firstName} ${user.lastName}`,
+        shareMeetingLink: getMeetingLink()
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsBooking(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsBooking(false);
+      console.log(data.message);
+      toast.error(`${data.message}`, {
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        duration: 4000,
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+        
+      });
+    }
+  }
 
   
 
@@ -1223,11 +1323,10 @@ const browseImageOnly = (e: any) => {
              <X className=" h-7 text-white" />
             </button>
             <div className="relative w-full h-full">
-              <Image
-                src={user?.profilepicURL ? user?.profilepicURL : image}
+              <img
+                  src={`https://ui-avatars.com/api/?background=random&name=${user?.firstName}+${user?.lastName}`}
                 alt=""
-                layout="fill"
-                objectFit="contain"
+                width={100} height={100}
                 className="w-full h-full"
               />
               {
@@ -1336,7 +1435,7 @@ const browseImageOnly = (e: any) => {
       
           <div className="relative">
   <img 
-    src={user?.profilepicURL ? user?.profilepicURL : image}
+    src={`https://ui-avatars.com/api/?background=random&name=${user?.firstName}+${user?.lastName}`}
     alt="" 
     width={100} height={100}
     onClick={handleZoom}
@@ -1421,6 +1520,24 @@ const browseImageOnly = (e: any) => {
                      }
                   
                   </div>
+                  
+                   
+                      <div className="space-y-2">
+                        <Label htmlFor="location">Location</Label>
+                        <Input
+                        value={newUser.location ? newUser.location : user?.location}
+                        placeholder={user?.location}
+                        onChange={(e) => setNewUser({ ...newUser, location: e.target.value })}
+                         id="location" type="text" />
+                         {
+                           /* fetching input skeleton */
+                            !user?.location && (
+                              <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
+                            )
+                         }
+                      </div>
+                    
+                  
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -1536,6 +1653,20 @@ const browseImageOnly = (e: any) => {
                           <a href={`mailto:${user?.email}`} className=" text-black no-underline ">
                             <Mail className="w-5 h-5" />
                           </a>
+                        </CardDescription>
+                      </Card>
+                    </div>
+                    <div className="space-y-2">
+                      <Card className=" p-2 ">
+                        <CardTitle>Location</CardTitle>
+                        <CardDescription className="flex items-start gap-x-2 m-2 justify-start">
+                          <Badge className=" bg-transparent h-5 text-black hover:bg-transparent text-lg font-medium">
+                          {user?.location}
+                          </Badge>
+                          {/* location */}
+                          <span className=" text-black no-underline ">
+                            <MapPin className="w-5 h-5" />
+                          </span>
                         </CardDescription>
                       </Card>
                     </div>
@@ -2049,6 +2180,8 @@ const browseImageOnly = (e: any) => {
                   <Label htmlFor="full_name">Full Name</Label>
                   <Input
                     id="full_name"
+                    value={bookingName}
+                    onChange={(e) => setBookingName(e.target.value)}
                     type="text"
                     placeholder="Enter your full name"
                   />
@@ -2057,6 +2190,8 @@ const browseImageOnly = (e: any) => {
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
+                    value={bookingEmail}
+                    onChange={(e) => setBookingEmail(e.target.value)}
                     type="email"
                     placeholder="Enter your email"
                   />
@@ -2064,12 +2199,17 @@ const browseImageOnly = (e: any) => {
                 <div className="space-y-2">
                   <Label htmlFor="message">Message</Label>
                   <Textarea
+                  value={bookingMessage}
+                  onChange={(e) => setBookingMessage(e.target.value)}
                     id="message"
                     placeholder="Enter your message"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Button className="justify-self-center flex justify-center items-center mx-auto w-full">Book 
+                  <Button 
+                  onClick={handleBooking}
+                  disabled={isCheckingHour || selectedHour === null || isBooking}
+                  className="justify-self-center flex justify-center items-center mx-auto w-full">Book 
                     Meeting
                   </Button>
                 </div>
