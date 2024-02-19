@@ -186,4 +186,5 @@ model Meeting {
   shareMeetingLink String @default("")
   expert     Expert   @relation(fields: [expertId], references: [id])
   expertId  Int
+  isAccepted Boolean @default(false)
 }

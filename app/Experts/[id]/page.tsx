@@ -15,6 +15,7 @@ import { ArrowRight, Contact2Icon, Edit2Icon, ExternalLink, Loader2, LogOut, Mai
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import Loader from "@/app/components/loader";
+import RequestCard from "@/app/components/RequestCards";
 type Props={
   params:{
     id: number
@@ -68,6 +69,17 @@ interface ServiceProps {
 index: number;
 id: number;
 }
+interface Request {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  hour: number;
+  expertEmail: string;
+  expertName: string;
+  shareMeetingLink: string;
+  isAccepted: boolean;
+}
 export default function Component({params}:Props) {
   const { id } = params
   const router = useRouter()
@@ -115,6 +127,8 @@ export default function Component({params}:Props) {
   const [isBookingInfo, setIsBookingInfo] = useState(false);
   const [bookingEmail, setBookingEmail] = useState('');
   const [bookingName, setBookingName] = useState('');
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [isFetchingRequests, setIsFetchingRequests] = useState(false);
 
   const [user, setUser] = useState<ExpertProfile>({
     id: 0,
@@ -151,6 +165,49 @@ export default function Component({params}:Props) {
     location: ''
   })
 
+  //fetching all requests booked by user
+  const fetchRequests = async () => {
+    setIsFetchingRequests(true)
+    const res = await fetch(`/api/auth/expert/requests`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      const requests: Request[] = data.data;
+      setRequests(requests);
+      console.log(requests);
+      setIsFetchingRequests(false);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsFetchingRequests(false);
+      console.log(data.message);
+      toast.error(data.message,{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+    }
+  };
   const getMeetingLink = () => {
     const randomString = Math.random().toString(36).substring(7);
     return `http://localhost:3000/meeting/${randomString}`;
@@ -1688,6 +1745,22 @@ const browseImageOnly = (e: any) => {
                 </CardContent> 
                 </Card>
                 
+              )
+             }
+             {
+              isExpert && (<>
+              <div className="flex flex-wrap justify-center">
+                {requests.map((request) => (
+                  <RequestCard key={request.id} request={request} />
+                ))}
+              </div>
+              </>)
+             }
+             {
+              isFetchingRequests && (
+                <div className=" flex justify-center items-center mx-auto">
+                 <Loader2 className=" animate-spin" size={30} />
+                </div>
               )
              }
              {

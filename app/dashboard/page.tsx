@@ -183,7 +183,7 @@ export default function Dashboard() {
 
   return (
     <>
-     <section className=" p-4 min-h-screen">
+     <section className=" p-4 min-h-screen overflow-hidden">
       <div className="container mx-auto p-4">
        <Card className='p-2 m-3 flex  flex-row justify-between items-center gap-x-3'>
         <h1 className="text-2xl font-semibold">Dashboard <span className=' text-xs italic'>(Admin view only)</span></h1>
@@ -203,16 +203,16 @@ export default function Dashboard() {
 
        </Card>
   <Card className="p-4 mb-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white p-4 shadow rounded-md">
-            <h2 className="text-xl font-semibold mb-2">All Experts</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-white max-h-80 border border-gray-500  overflow-y-auto p-4 shadow rounded-md">
+            <CardDescription className="text-xl font-semibold mb-2">All Experts</CardDescription>
             {  allExperts.map((expert:Expert,index:number) => (
-             <Card className='p-2 flex justify-start items-start gap-2  flex-col m-2  sm:min-w-[500px]'>
+             <Card className='p-2  border flex justify-start items-start gap-2  flex-col m-2  sm:min-w-[500px]'>
               <div className='flex items-center gap-x-1'>
               <span>
                     {index+1}
               </span>
-               <div key={index}>{expert.firstName + ' ' + expert.lastName}</div>
+               <div  className=' font-extrabold text-2xl' key={index}>{expert.firstName + ' ' + expert.lastName}</div>
              </div>
 
              {/* booking */}
@@ -261,8 +261,8 @@ export default function Dashboard() {
             }
           </div>
 
-          <div className="bg-white p-4 shadow rounded-md">
-            <h2 className="text-xl font-semibold mb-2">Active Experts</h2>
+          <div className="bg-white p-4  overflow-y-auto min-h-80 border border-gray-500 shadow rounded-md">
+            <CardDescription className="text-xl font-semibold mb-2">Active Experts</CardDescription>
             {activeExperts.map((expert:Expert,index:number) => (
                /* random numbering */
                <Card className='p-2 flex justify-start items-start gap-2  flex-col m-2  sm:min-w-[500px]'>
@@ -270,7 +270,7 @@ export default function Dashboard() {
                <span>
                      {index+1}
                </span>
-                <div key={index}>{expert.firstName + ' ' + expert.lastName}</div>
+                <div className=' text-2xl font-extrabold' key={index}>{expert.firstName + ' ' + expert.lastName}</div>
               </div>
  
               {/* booking */}
@@ -319,8 +319,8 @@ export default function Dashboard() {
             }
           </div>
 
-          <div className="bg-white p-4 shadow rounded-md">
-            <h2 className="text-xl font-semibold mb-2">All Users</h2>
+          <div className=" overflow-y-auto min-h-80 border border-gray-500  shadow-black p-4 shadow rounded-md">
+            <CardDescription className="text-xl font-semibold mb-2">All Users</CardDescription>
             {allUsers?.map((user:User,index:number) => (
                <div className='flex items-center gap-x-1'>
                <span>
@@ -341,8 +341,8 @@ export default function Dashboard() {
             }
           </div>
 
-          <div className="bg-white p-4 shadow rounded-md">
-            <h2 className="text-xl font-semibold mb-2">Active Users</h2>
+          <div className="bg-white p-4 overflow-y-auto min-h-80 border border-gray-500  shadow rounded-md">
+            <CardDescription className="text-xl font-semibold mb-2">Active Users</CardDescription>
             {activeUsers?.map ((user:User,index:number) => (
               <div className='flex items-center gap-x-1'>
               <span>
