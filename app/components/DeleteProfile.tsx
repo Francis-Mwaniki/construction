@@ -13,7 +13,7 @@ const DeleteComponent = ({ onDelete }: DeleteComponentProps) => {
 
   const handleDelete = () => {
     // Check if the confirmation input matches the expected value
-    if (confirmInput === 'DELETE') {
+    if (confirmInput === 'DEACTIVATE') {
       onDelete();
     } else {
       toast.error('Incorrect confirmation input',
@@ -33,13 +33,13 @@ const DeleteComponent = ({ onDelete }: DeleteComponentProps) => {
 
   return (
     <div className="bg-white p-4  rounded shadow">
-      <h2 className="text-lg font-semibold mb-4">Confirm Deletion</h2>
-      <p className="mb-4">To confirm deletion, type <strong className=' font-extrabold text-red-600'>DELETE</strong> in the input below:</p>
+      <h2 className="text-lg font-semibold mb-4">Confirm Deactivate</h2>
+      <p className="mb-4">To confirm deactivate, type <strong className=' font-extrabold text-red-600'>DEACTIVATE</strong> in the input below:</p>
 
       <input
         type="text"
         value={confirmInput}
-        placeholder='DELETE'
+        placeholder='DEACTIVATE'
         onChange={(e) => setConfirmInput(e.target.value)}
         className="border rounded p-2 mb-4 border-red-300"
       />
@@ -49,7 +49,7 @@ const DeleteComponent = ({ onDelete }: DeleteComponentProps) => {
           onClick={handleDelete}
           className="bg-red-500 text-white px-4 py-2 rounded mr-2"
         >
-          Delete
+          Deactivate
         </button>
         <button
           onClick={() => setConfirmInput('')}

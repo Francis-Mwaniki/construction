@@ -20,7 +20,7 @@ const LoginForm  = () => {
 
     try {
         // Send login request to server
-        const response = await fetch('/api/auth/expert/loginAsExpert', {
+        const response = await fetch('/api/auth/Admin/loginAsAdmin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
@@ -33,11 +33,10 @@ const LoginForm  = () => {
           return
         }
         if(data.status === 200){
-          localStorage.setItem('isExpert', 'true');
-          let random = Math.random().toString(36).substring(7);
-          
+          localStorage.setItem('isAdmin', 'true');
+            let random = Math.random().toString(36).substring(7);
             setLoading(false);
-          router.push(`/Experts/${data.id}?token=${random}`);
+          router.push(`/Admins/${data.id}?token=${random}`);
         }
         
     } catch (error: any) {
@@ -49,7 +48,7 @@ const LoginForm  = () => {
   return (
     <Card className="border justify-center items-center  m-auto flex min-h-screen shadow-lg p-4 sm:max-w-5xl my-4 w-full mx-auto">
               <Card className='p-10 flex flex-col space-y-4 max-w-md mx-auto'>
-    <h1 className="text-2xl font-semibold text-center">Login As Expert</h1>
+    <h1 className="text-2xl font-semibold text-center">Login As Admin</h1>
     <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
       {/* Error message (conditionally rendered) */}
       {error && (
@@ -97,10 +96,21 @@ const LoginForm  = () => {
         {
             loading ? (
                 <Loader2 size={24} className='animate-spin'/>
-            ) : 'Login As Expert'
+            ) : 'Login As Admin'
         }
       </Button>
+
     </form>
+
+    {/* register  */}
+    <div className="text-center">
+      <p>
+        Don't have an account?{' '}
+        <a href="/RegisterAsAdmin" className="text-blue-500">
+          Register As Admin
+        </a>
+      </p>
+    </div>
     </Card>
     </Card>
   );

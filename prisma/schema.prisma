@@ -141,17 +141,19 @@ model Expert {
   firstName          String   @default("")
   lastName           String   @default("")
   email              String   @unique
-  certifications     String?  @default("")
-  services           String?  @default("")
+  certifications     String[] @default(["certified specialist", "certified expert"])
+  services           String[] @default(["Renovation", "Construction", "Design"])
   bio                String?  @default("")
   password           String   @default("")
   verifiedWebsites   String[]  @default([])
+  isAccountDeactivated Boolean  @default(false)
   availableDay        String?  @default("")
   startTime          String?  @default("")
   endTime            String?  @default("")
+  isApproved         Boolean  @default(false)
   profilepicURL     String?  @default("") // Store URL instead of local path
-
   profilepic         File?    // Optional relation to a File model (if needed)
+  projectss           String[] @default(["Successful Renovation of 3 bedroom house", "Construction of 2 storey building"])
 
   @@index([email]) // Create an index on the email field for faster lookups
 }
