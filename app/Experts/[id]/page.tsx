@@ -210,7 +210,7 @@ export default function Component({params}:Props) {
   };
   const getMeetingLink = () => {
     const randomString = Math.random().toString(36).substring(7);
-    return `http://localhost:3000/meeting/${randomString}`;
+    return `https://construction-ruby.vercel.app/meeting/${randomString}`;
   }
 
 
