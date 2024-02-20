@@ -27,6 +27,7 @@ const RegisterForm = () => {
         router.push('/RegisterAsAdmin');
         break;
       default:
+        router.push('/Register');
         break;
     }
   };
@@ -41,7 +42,8 @@ const RegisterForm = () => {
       case 'admin':
         router.push('/LoginAsAdmin');
         break;
-      default:
+      default: 
+      router.push('/Login');
         break;
     }
   }
@@ -71,6 +73,10 @@ const RegisterForm = () => {
             className="w-full p-2  border rounded-md focus:outline-none bg-white appearance-auto"
             onChange={(e) => handleRegisterRoleSelection(e.target.value)}
           >
+            {/* default select rolw */}
+            <option className=' h-8 appearance-none' value="Select Role">
+              Select Role
+            </option>
             <option className=' h-8 appearance-none' value="landowner">LandOwner</option>
             <option className=' h-8 appearance-none' value="expert">Expert</option>
             <option className=' h-8 appearance-none' value="admin">Admin</option>
@@ -104,6 +110,10 @@ const RegisterForm = () => {
             className="w-full p-2 border rounded-md focus:outline-none bg-white appearance-auto"
             onChange={(e) => handleLoginRoleSelection(e.target.value)}
           >
+            {/* default select rolw */}
+            <option className=' h-8 appearance-none' value="Select Role">
+              Select Role
+            </option>
             <option className=' h-8 appearance-none' value="landowner">LandOwner</option>
             <option className=' h-8 appearance-none' value="expert">Expert</option>
             <option className=' h-8 appearance-none' value="admin">Admin</option>

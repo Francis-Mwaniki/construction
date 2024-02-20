@@ -79,6 +79,7 @@ interface Request {
   expertName: string;
   shareMeetingLink: string;
   isAccepted: boolean;
+  expertId: number;
 }
 export default function Component({params}:Props) {
   const { id } = params
@@ -177,7 +178,7 @@ export default function Component({params}:Props) {
     });
 
     const data = await res.json();
-    console.log(data);
+    console.log("request",data);
 
     if (data.status === 200) {
       const requests: Request[] = data.data;
@@ -1753,10 +1754,12 @@ const browseImageOnly = (e: any) => {
               <CardDescription className=" font-extrabold text-2xl justify-center items-center mx-auto flex m-2">
                 All Booking Requests
               </CardDescription>
-              <div className="flex flex-wrap justify-center">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 ">
 
                 {requests.map((request) => (
-                  <RequestCard key={request.id} request={request} />
+                  <RequestCard key={request.id} request={request}
+                  expertId={user?.id}
+                   />
                 ))}
               </div>
               </>)
