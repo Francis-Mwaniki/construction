@@ -109,7 +109,7 @@ const LoginForm  = () => {
     {/* register  */}
     <div className="text-center">
       <p>
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <a href="/RegisterAsAdmin" className="text-blue-500">
           Register As Admin
         </a>

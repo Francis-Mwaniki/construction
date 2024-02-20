@@ -207,7 +207,7 @@ export default function Dashboard() {
           <div className="bg-white max-h-80 border border-gray-500  overflow-y-auto p-4 shadow rounded-md">
             <CardDescription className="text-xl font-semibold mb-2">All Experts</CardDescription>
             {  allExperts.map((expert:Expert,index:number) => (
-             <Card className='p-2  border flex justify-start items-start gap-2  flex-col m-2  sm:min-w-[500px]'>
+             <Card key={index} className='p-2  border flex justify-start items-start gap-2  flex-col m-2  sm:min-w-[500px]'>
               <div className='flex items-center gap-x-1'>
               <span>
                     {index+1}
@@ -239,7 +239,7 @@ export default function Dashboard() {
                 <div key={index}>
                   {
                     expert.services.map((service:string,index:number) => (
-                      <CardDescription className='p-2 italic' key={index}>{service}</CardDescription>
+                      <CardDescription key={index} className='p-2 italic'>{service}</CardDescription>
                     ))
                   }
                 </div>
@@ -265,7 +265,7 @@ export default function Dashboard() {
             <CardDescription className="text-xl font-semibold mb-2">Active Experts</CardDescription>
             {activeExperts.map((expert:Expert,index:number) => (
                /* random numbering */
-               <Card className='p-2 flex justify-start items-start gap-2  flex-col m-2  sm:min-w-[500px]'>
+               <Card key={index} className='p-2 flex justify-start items-start gap-2  flex-col m-2  sm:min-w-[500px]'>
                <div className='flex items-center gap-x-1'>
                <span>
                      {index+1}
@@ -322,7 +322,7 @@ export default function Dashboard() {
           <div className=" overflow-y-auto min-h-80 border border-gray-500  shadow-black p-4 shadow rounded-md">
             <CardDescription className="text-xl font-semibold mb-2">All Users</CardDescription>
             {allUsers?.map((user:User,index:number) => (
-               <div className='flex items-center gap-x-1'>
+               <div key={index} className='flex items-center gap-x-1'>
                <span>
                     {index+1}
                 </span>
@@ -344,7 +344,7 @@ export default function Dashboard() {
           <div className="bg-white p-4 overflow-y-auto min-h-80 border border-gray-500  shadow rounded-md">
             <CardDescription className="text-xl font-semibold mb-2">Active Users</CardDescription>
             {activeUsers?.map ((user:User,index:number) => (
-              <div className='flex items-center gap-x-1'>
+              <div key={index} className='flex items-center gap-x-1'>
               <span>
                     {index+1}
                 </span>

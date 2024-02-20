@@ -69,7 +69,7 @@ const [send, setSend] = useState(false);
         </div>
             <h2 className="text-lg font-semibold mb-4 text-center mt-3">Chat with us</h2>
             <p className="text-sm mb-4">
-              Send a quick message and we'll get back to you as soon as
+              Send a quick message and we&apos;ll get back to you as soon as
                 possible
             </p>
             <div className="mb-4">

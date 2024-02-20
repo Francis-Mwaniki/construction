@@ -155,7 +155,7 @@ export default function Component ({params}:Props) {
                 width="100"
               /> */}
               <div className="space-y-2">
-                <h3 className="text-lg font-bold">Expert's Profile</h3>
+                <h3 className="text-lg font-bold">Expert&apos;s Profile</h3>
                 <p className="text-gray-600 dark:text-gray-400">
                   Our expert, {
                         decodeUsername
