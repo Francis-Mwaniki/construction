@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+     "node": "node server.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "node": "node server.js"
+    "dev": "next dev"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",

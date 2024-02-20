@@ -115,7 +115,7 @@ export default function Home({params}:Props) {
     userName,
   ]);
 
-  const socket = io("http://localhost:3001");
+  const socket = io("https://soket-9qe7.onrender.com");
 
   const handleJoin = () => {
     if (userName !== "" && roomId !== "") {
