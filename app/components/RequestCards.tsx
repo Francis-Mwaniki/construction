@@ -1,7 +1,7 @@
 // components/RequestCard.tsx
 
 import { Button } from "@/components/ui/button";
-import { CheckCheck, Loader2 } from "lucide-react";
+import { CheckCheck, CheckCircle, Loader2 } from "lucide-react";
 import React from "react";
 import toast from "react-hot-toast";
 
@@ -146,7 +146,9 @@ interface Request {
           </div>
           <>
           <div className="mt-4">
-              <Button
+            {
+              !isAccepted && (<>
+                <Button
               onClick={handleAccept}
                 className=" flex  justify-start gap-x-2"
               >
@@ -158,12 +160,36 @@ interface Request {
                     </>
                   ) : (
                    <>
-                   <span className="text-white">Accept</span>
+                 
+                   
+                   
+                        <span className="text-white">Accept</span>
                 <CheckCheck className="w-6 h-6 ml-2" />
+                     
+                    
+                 
                    </>
                   )
                 }
               </Button>
+              </>)
+            }
+           {
+            isAccepted && (
+              <>
+                  <Button
+              disabled
+                className=" flex  justify-start gap-x-2"
+              >
+               
+                <span className="" >Accepted</span>
+                      <CheckCircle size={24} />
+                    
+               
+              </Button>
+              </>
+            )
+           }
              
             </div>
           </>

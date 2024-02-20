@@ -27,7 +27,7 @@ const LoginForm  = () => {
           body: JSON.stringify({ email, password }),
         });
         const data = await response.json();
-        console.log(data);
+        console.log("logs",data?.data);
         if(data.status === 400 || data.status === 401 || data.status === 500){
           setError(data.message);
             setLoading(false);
@@ -35,6 +35,7 @@ const LoginForm  = () => {
         }
           localStorage.setItem('isExpert', 'true');
           localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data?.data.firstName + " " + data?.data.lastName));
 
           let random = Math.random().toString(36).substring(7)
             setLoading(false);
