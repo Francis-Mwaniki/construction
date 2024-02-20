@@ -1,13 +1,13 @@
 "use client"
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import ChatPage from "../components/room";
+import ChatPage from "../../components/room";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Copy, Loader, Loader2, Share } from "lucide-react";
-import MessageBalance from "../components/MessageBalance";
-import UpgradePrompt from "../components/Upgrade";
-import MessageList from '../components/MessagesList';
+import { Copy, Loader, Loader2, MessageSquareText, Share } from "lucide-react";
+import MessageBalance from "../../components/MessageBalance";
+import UpgradePrompt from "../../components/Upgrade";
+import MessageList from '../../components/MessagesList';
 import toast from "react-hot-toast";
 import Link from "next/link";
 import {
@@ -20,30 +20,24 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { SelectProps } from "@radix-ui/react-select";
-export default function Home() {
+
+
+type Props = {
+  params:{
+    id: string;
+  }
+}
+
+export default function Home({params}:Props) {
+  const {id} = params;
   const [showChat, setShowChat] = useState(false);
   const [userName, setUserName] = useState("");
   const [showSpinner, setShowSpinner] = useState(false);
   const [roomId, setRoomId] = useState("");
   const [generatedRoomId, setGeneratedRoomId] = useState("");
-  const [messages, setMessages] = useState<number>(10); 
-  const [messageCount, setMessageCount] = useState<number>(5); 
+  const [messages, setMessages] = useState<number>(50); 
+  const [messageCount, setMessageCount] = useState<number>(50); 
  
-  const Experts = [
-    { id: 1, name: "Frank -contractor" },
-    { id: 2, name: "Carter -plumber" },
-    { id: 3, name: "Oliver -electrician" },
-    { id: 4, name: "Liam -carpenter" },
-    { id: 5, name: "Noah -painter" },
-    { id: 6, name: "Elijah -mason" },
-    { id: 7, name: "William -roofer" },
-    { id: 8, name: "James -landscaper" },
-  ];
-  const [selectedExpert, setSelectedExpert] = useState<string>("");
-  const handleExpertChange = (expert: string) => {
-    setSelectedExpert(expert);
-  };
-
 
 
   const handleMessageSent = () => {
@@ -61,7 +55,7 @@ export default function Home() {
         .share({
           title: "Chat App",
           text: "Join my chat room",
-          url: `https://localhost:3000/share/${id}`,
+          url: `https://localhost:3000/meeting/${id}`,
         })
         .then(() => {
           toast.success('shared', {
@@ -111,18 +105,17 @@ export default function Home() {
 
   useEffect(() => {
     let user = localStorage.getItem("user");
-    if (user) {
+    let isExpert = localStorage.getItem("isExpert");
+
+    if (user ) {
       setUserName(user);
-    }
-    if(!user) {
-      setUserName('');
     }
   }
   , [
     userName,
   ]);
 
-  const socket = io("http://localhost:3001");
+  const socket = io("https://soket-9qe7.onrender.com");
 
   const handleJoin = () => {
     if (userName !== "" && roomId !== "") {
@@ -150,8 +143,21 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    if(id){
+      setRoomId(id);
+      handleJoin();
+
+
+    }
+
+  }
+  , [
+    id,
+  ]);
+
   return (
-    <div className="flex flex-col  min-h-screen">
+    <div className="flex flex-col overflow-hidden  min-h-screen">
       
       {
         !showChat && (
@@ -172,36 +178,22 @@ export default function Home() {
             <>
 
               <h3 className="text-2xl font-bold mb-4">
-            {userName ? `Welcome ${userName}` : "Enter your roomID to join chat"}
+            {userName ? `Welcome ${userName}` : "Welcome, Join a chat room"}
           </h3>
-          <div className="mb-4">
-          <Select>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select an Expert" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Expert</SelectLabel>
-          {Experts.map((expert) => (
-            <SelectItem
-              key={expert.id}
-              onSelect={() => handleExpertChange(expert.name)}
-              value={expert.name}
-            >
-              {expert.name}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-        </div>
+          <p className="text-sm text-gray-500 mb-4">
+            click the button below to join a chat room
+          </p>
+        
            <div className="mb-4 text-center flex flex-row justify-center items-center">
         
           <Input
-            className="border p-2 rounded-lg mr-2 text-black"
+            className="border hidden p-2 rounded-lg mr-2 text-black"
             type="text"
+            readOnly
+            hidden={true}
             placeholder="Room Id"
             onChange={(e) => setRoomId(e.target.value)}
+            value={roomId}
             disabled={showSpinner}
           />
           <Button
@@ -209,17 +201,19 @@ export default function Home() {
             onClick={handleJoin}
             disabled={showSpinner}
           >
-            {!showSpinner ? "Join" : "Loading..."}
+            {!showSpinner ? (<>
+            <span>Join Room</span>
+            <MessageSquareText size={16} className="ml-2" />
+            </>) : "Loading..."}
           </Button>
         </div>
             </>
           )
         }
          
-         {/* generate unique id */}
-       
-          <div className="mb-4">
-              {
+
+      
+              {/* {
           userName !== "" && (
            <Button
             className=" text-white px-4 py-2 rounded-lg"
@@ -228,9 +222,9 @@ export default function Home() {
             Generate Room Id
           </Button>
           )
-         }
+         } */}
           
-          {
+          {/* {
             generatedRoomId && (
               <div className="flex justify-center items-center">
               <p className="text-sm text-gray-500 mt-2">
@@ -243,7 +237,7 @@ export default function Home() {
                 onClick={() => copyToClipboard(generatedRoomId)}
               />
                <span className="text-sm text-gray-500 mt-2 mx-2">|</span>
-               {/* share */}
+              
                <Share
                 size={16}
                 className="cursor-pointer"
@@ -252,9 +246,9 @@ export default function Home() {
               </div>
 
             )
-          }
+          } */}
 
-            </div>
+            
          {
             showSpinner && (
               <div className="flex justify-center items-center">

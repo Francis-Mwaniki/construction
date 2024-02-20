@@ -47,7 +47,10 @@ const RegisterForm = () => {
   }
 
   return (
-    <div className="flex flex-row gap-x-2 justify-center items-center h-screen">
+    <div className=' space-y-7 my-9 overflow-hidden overflow-y-hidden'>
+      <h4 className='text-2xl font-semibold text-center mb-4'>Welcome to Consite</h4>
+      <p className='text-center text-gray-600'>Please select your role and proceed to register or login</p>
+   <div className="flex flex-row gap-x-2 justify-center items-center h-screen">
       
       <div className="bg-white p-8 shadow-lg rounded-md w-96  h-72">
         <h2 className="text-2xl font-semibold mb-6 text-center">Register</h2>
@@ -108,6 +111,9 @@ const RegisterForm = () => {
         </div>
         </div>
     </div>
+   
+   </div>
+    
   );
 };
 

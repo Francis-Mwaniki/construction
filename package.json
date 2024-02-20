@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+     "node": "node server.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "node": "node server.js"
+    "dev": "next dev"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -25,6 +25,7 @@
     "cheerio": "1.0.0-rc.12",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "@sendgrid/mail": "^8.1.0",
     "cors": "^2.8.5",
     "dialog": "^0.3.1",
     "ffmpeg-static": "^5.2.0",

@@ -16,9 +16,10 @@ const ExpertApplicationForm: React.FC<ExpertFormProps> = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [certifications, setCertifications] = useState('');
-  const [services, setServices] = useState('');
-  const [verifiedWebsites, setVerifiedWebsites] = useState<string[]>(['', '', '']); // Initialize with 3 empty strings
+  const [certifications, setCertifications] = useState<string[]>(['', '', '']); 
+  const [services, setServices] = useState<string[]>(['', '', '']); 
+  const [verifiedWebsites, setVerifiedWebsites] = useState<string[]>(['', '', '']); 
+  const [projectss, setProjectss] = useState<string[]>(['', '', '']);
     const [profilepic, setProfilePic] = useState('');
     const [availableDay, setAvailableDay] = useState('');
     const [startTime, setStartTime] = useState('');
@@ -28,12 +29,27 @@ const ExpertApplicationForm: React.FC<ExpertFormProps> = () => {
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [loading, setLoading] = useState(false);
-
+    const [location, setLocation] = useState('');
   const handleWebsiteChange = (index: number, value: string) => {
     const updatedWebsites = [...verifiedWebsites];
     updatedWebsites[index] = value;
     setVerifiedWebsites(updatedWebsites);
   };
+  const handleCertificationChange = (index: number, value: string) => {
+    const updatedCertifications = [...certifications];
+    updatedCertifications[index] = value;
+    setCertifications(updatedCertifications);
+  };
+  const handleServiceChange = (index: number, value: string) => {
+    const updatedServices = [...services];
+    updatedServices[index] = value;
+    setServices(updatedServices);
+  };
+  const handleProjectChange = (index: number, value: string) => {
+    const updatedProjects = [...projectss];
+    updatedProjects[index] = value;
+    setProjectss(updatedProjects);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +57,7 @@ const ExpertApplicationForm: React.FC<ExpertFormProps> = () => {
 
     // Basic form validation
     if (!firstName || !lastName || !email || !certifications || !services || verifiedWebsites.some((website) => !website.trim()) 
-    || !availableDay || !startTime || !endTime || !profilepic || !bio || !password || !passwordConfirm) {
+    || !availableDay || !startTime || !endTime || !profilepic || !bio || !password || !passwordConfirm || !projectss || !location) {
       alert('Please fill in all required fields.');
       return;
     }
@@ -64,6 +80,8 @@ const ExpertApplicationForm: React.FC<ExpertFormProps> = () => {
         bio,
         password,
         passwordConfirm,
+        projectss,
+        location
     };
      await fetch('/api/auth/expert/apply', {
         method: 'POST',
@@ -165,26 +183,59 @@ const ExpertApplicationForm: React.FC<ExpertFormProps> = () => {
                 onChange={(e: { target: { value: string; }; }) => setEmail(e.target.value)}
                 />
             </div>
+            <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <Input
+                id="location"
+                placeholder="Enter your location"
+                value={location}
+                onChange={(e: { target: { value: string; }; }) => setLocation(e.target.value)}
+                />
+            </div>
             <Card className='p-4 flex flex-col space-y-4'>
             <div className="space-y-2">
                 <Label htmlFor="certifications">Certifications</Label>
                 {/* url */}
-                <Input
-                id="certifications"
-                placeholder="Enter your certifications"
-                value={certifications}
-                onChange={(e: { target: { value: string; }; }) => setCertifications(e.target.value)}
-                />
+                {
+                      certifications.map((certification, index) => (
+                        <Input
+                        key={index}
+                        id={`certification-${index + 1}`}
+                        placeholder={`Enter certification ${index + 1}`}
+                        value={certification}
+                        onChange={(e: { target: { value: string; }; }) => handleCertificationChange(index, e.target.value)}
+                        />
+                      ))  
+                }
                
             </div>
             <div className="space-y-2">
+                <Label htmlFor="projects">Projects</Label>
+                {
+                    projectss.map((project, index) => (
+                      <Input
+                      key={index}
+                      id={`project-${index + 1}`}
+                      placeholder={`Enter project ${index + 1}`}
+                      value={project}
+                      onChange={(e: { target: { value: string; }; }) => handleProjectChange(index, e.target.value)}
+                      />
+                    ))
+                }
+            </div>
+            <div className="space-y-2">
                 <Label htmlFor="services">Services</Label>
-                <Input
-                id="services"
-                placeholder="Enter your services"
-                value={services}
-                onChange={(e: { target: { value: string; }; }) => setServices(e.target.value)}
-                />
+               {
+                    services.map((service, index) => (
+                      <Input
+                      key={index}
+                      id={`service-${index + 1}`}
+                      placeholder={`Enter service ${index + 1}`}
+                      value={service}
+                      onChange={(e: { target: { value: string; }; }) => handleServiceChange(index, e.target.value)}
+                      />
+                    ))
+               }
             </div>
 
           <div className="space-y-2">

@@ -23,6 +23,14 @@ model User {
   messages  Message[]
   
 }
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  
+  
+}
 
 model ChatRoom {
   id      Int      @id @default(autoincrement())
@@ -151,10 +159,11 @@ model Expert {
   startTime          String?  @default("")
   endTime            String?  @default("")
   isApproved         Boolean  @default(false)
+  location           String?  @default("Nairobi")
   profilepicURL     String?  @default("") // Store URL instead of local path
   profilepic         File?    // Optional relation to a File model (if needed)
   projectss           String[] @default(["Successful Renovation of 3 bedroom house", "Construction of 2 storey building"])
-
+ meetings           Meeting[]
   @@index([email]) // Create an index on the email field for faster lookups
 }
 
@@ -163,4 +172,19 @@ model File { // Optional model for storing profile images
   url    String  @unique
   expert Expert  @relation(fields: [userId], references: [id]) // Replace "user" with "expert"
   userId Int     @unique
+}
+
+
+model Meeting {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
+  hour      Int
+  expertEmail String
+  expertName String
+  shareMeetingLink String @default("")
+  expert     Expert   @relation(fields: [expertId], references: [id])
+  expertId  Int
+  isAccepted Boolean @default(false)
 }

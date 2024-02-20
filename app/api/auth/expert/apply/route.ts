@@ -13,10 +13,10 @@ export async function POST(req: Request, res: Response) {
       return new NextResponse("Invalid request", { status: 400 });
     }
 
-    const { firstName,bio, lastName, email, password, certifications, services, verifiedWebsites, availableDay, startTime, endTime, profilepicURL } =await req.json();
+    const { firstName,bio, lastName, email, password, certifications, services, verifiedWebsites, availableDay, startTime, endTime, profilepicURL,projectss } =await req.json();
 
     // Log request body
-    console.log(firstName, lastName, email, password, certifications, bio, services, verifiedWebsites, availableDay, startTime, endTime, profilepicURL);
+    console.log(firstName, lastName, email, password, certifications, bio, services, verifiedWebsites, availableDay, startTime, endTime, profilepicURL,projectss);
     // Validate email format
     if (!validateEmail(email)) {
       return NextResponse.json({ message: "Invalid email format", status: 400 });
@@ -56,6 +56,7 @@ export async function POST(req: Request, res: Response) {
         startTime,
         endTime,
         profilepicURL,
+        projectss,
         
       },
     });

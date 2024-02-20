@@ -11,9 +11,11 @@ import React from "react"
 import DeleteComponent from "../../components/DeleteProfile"
 import toast from "react-hot-toast"
 import {useRouter} from "next/navigation"
-import { ArrowRight, Contact2Icon, Edit2Icon, ExternalLink, Loader2, LogOut, Mail, User, Verified, X } from "lucide-react"
+import { ArrowRight, Contact2Icon, Edit2Icon, ExternalLink, Loader2, LogOut, Mail, MapPin, User, Verified, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import Loader from "@/app/components/loader";
+import RequestCard from "@/app/components/RequestCards";
 type Props={
   params:{
     id: number
@@ -56,6 +58,7 @@ startTime: string;
 endTime: string;
 profilepicURL: string;
 projectss: string[];
+location: string;
 
 }
 interface ServiceProps {
@@ -65,6 +68,17 @@ interface ServiceProps {
   description: string;
 index: number;
 id: number;
+}
+interface Request {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  hour: number;
+  expertEmail: string;
+  expertName: string;
+  shareMeetingLink: string;
+  isAccepted: boolean;
 }
 export default function Component({params}:Props) {
   const { id } = params
@@ -90,8 +104,6 @@ export default function Component({params}:Props) {
   const [editDay, setEditDay] = useState(false)
   const [editStartTime, setEditStartTime] = useState(false)
   const [editTime, setEditTime] = useState(false)
-  
-
   const [service, setServices] = useState<ServiceProps>({
     icon: <span></span>,
     title: '',
@@ -108,6 +120,16 @@ export default function Component({params}:Props) {
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
   const [isCheckingHour, setIsCheckingHour] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [bookingMessage, setBookingMessage] = useState('');
+  const [isBooking, setIsBooking] = useState(false);
+  const [isBookingSuccess, setIsBookingSuccess] = useState('');
+  const [isBookingError, setIsBookingError] = useState('');
+  const [isBookingInfo, setIsBookingInfo] = useState(false);
+  const [bookingEmail, setBookingEmail] = useState('');
+  const [bookingName, setBookingName] = useState('');
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [isFetchingRequests, setIsFetchingRequests] = useState(false);
+
   const [user, setUser] = useState<ExpertProfile>({
     id: 0,
     firstName: '',
@@ -122,7 +144,8 @@ export default function Component({params}:Props) {
     startTime: '',
     endTime: '',
     profilepicURL: '',
-    projectss: []
+    projectss: [],
+    location: ''
   })
   const [newUser, setNewUser] = useState<ExpertProfile>({
     id: 0,
@@ -138,39 +161,29 @@ export default function Component({params}:Props) {
     startTime: '',
     endTime: '',
     profilepicURL: '',
-    projectss: []
+    projectss: [],
+    location: ''
   })
 
-  
-
-  const handleHourCheck = async (hour: number) => {
-    // /api/auth/expert/check_hour
-    const res = await fetch(`/api/auth/expert/check_hour`, {
+  //fetching all requests booked by user
+  const fetchRequests = async () => {
+    setIsFetchingRequests(true)
+    const res = await fetch(`/api/admin/experts/requests`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ hour })
+      body: JSON.stringify({ id })
     });
 
     const data = await res.json();
     console.log(data);
 
     if (data.status === 200) {
-      console.log(data.message);
-      toast.success(`${data.message}`, {
-        style: {
-          border: '1px solid #713200',
-          padding: '16px',
-          color: '#713200',
-        },
-        duration: 4000,
-        iconTheme: {
-          primary: '#713200',
-          secondary: '#FFFAEE',
-        },
-        
-      });
+      const requests: Request[] = data.data;
+      setRequests(requests);
+      console.log(requests);
+      setIsFetchingRequests(false);
     }
 
     if (
@@ -180,6 +193,96 @@ export default function Component({params}:Props) {
       data.status === 401 ||
       data.status === 405
     ) {
+      setIsFetchingRequests(false);
+      console.log(data.message);
+      toast.error(data.message,{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+    }
+  };
+  const getMeetingLink = () => {
+    const randomString = Math.random().toString(36).substring(7);
+    return `http://localhost:3000/meeting/${randomString}`;
+  }
+
+
+  const handleBooking = async (e: any) => {
+    e.preventDefault();
+    if(!bookingName || !bookingEmail){
+      setIsBooking(false);
+      toast.error('Please fill in all fields',{
+        style: {
+          border: '1px solid #713200',
+          padding: '16px',
+          color: '#713200',
+        },
+        iconTheme: {
+          primary: '#713200',
+          secondary: '#FFFAEE',
+        },
+      });
+      return;
+    }
+    // /api/auth/expert/booking
+    setIsBooking(true);
+    const res = await fetch(`/api/auth/expert/booking`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        id: id,
+        name: bookingName,
+        email: bookingEmail,
+        message: bookingMessage,
+        hour: selectedHour,
+        expertId: id,
+        expertEmail: user.email,
+        expertName: `${user.firstName} ${user.lastName}`,
+        shareMeetingLink: getMeetingLink()
+       })
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.status === 200) {
+      setIsBooking(false);
+      console.log(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+          
+        });
+      }, 4000);
+    }
+
+    if (
+      data.status === 400 ||
+      data.status === 500 ||
+      data.status === 404 ||
+      data.status === 401 ||
+      data.status === 405
+    ) {
+      setIsBooking(false);
+      console.log(data.message);
       toast.error(`${data.message}`, {
         style: {
           border: '1px solid #713200',
@@ -194,17 +297,136 @@ export default function Component({params}:Props) {
         
       });
     }
-  };
+  }
+
+  
+
+  // const handleHourCheck = async (hour: number) => {
+  //   // /api/auth/expert/check_hour
+  //   const res = await fetch(`/api/auth/expert/check_hour`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify({ hour })
+  //   });
+
+  //   const data = await res.json();
+  //   console.log(data);
+
+  //   if (data.status === 200) {
+  //     console.log(data.message);
+  //     toast.success(`${data.message}`, {
+  //       style: {
+  //         border: '1px solid #713200',
+  //         padding: '16px',
+  //         color: '#713200',
+  //       },
+  //       duration: 4000,
+  //       iconTheme: {
+  //         primary: '#713200',
+  //         secondary: '#FFFAEE',
+  //       },
+        
+  //     });
+  //   }
+
+  //   if (
+  //     data.status === 400 ||
+  //     data.status === 500 ||
+  //     data.status === 404 ||
+  //     data.status === 401 ||
+  //     data.status === 405
+  //   ) {
+  //     toast.error(`${data.message}`, {
+  //       style: {
+  //         border: '1px solid #713200',
+  //         padding: '16px',
+  //         color: '#713200',
+  //       },
+  //       duration: 4000,
+  //       iconTheme: {
+  //         primary: '#713200',
+  //         secondary: '#FFFAEE',
+  //       },
+        
+  //     });
+  //   }
+  // };
 
   useEffect(() => {
     if(selectedHour !== null){
       setIsCheckingHour(true);
-      handleHourCheck(
-        selectedHour
-      );
-      setTimeout(() => {
+  
+     // api call to check if the hour is available -api/auth/expert/bookings/precheck
+      const url = `/api/auth/expert/booking/precheck`;
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id:id, hour:selectedHour })
+      }
+      fetch(url,options).then(res => res.json()).then(data => {
+        if(data.status === 200){
+          setIsCheckingHour(false);
+          setIsBookingSuccess(data.message);
+         toast.success(`${data.message}`, {
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          duration: 4000,
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+
+        });
+        setTimeout(() => {
+          setIsBookingSuccess('');
+        }
+        , 4000);
+        }
+        if(data.status === 400 || data.status === 500){
+          setIsCheckingHour(false);
+          setIsBookingError(data.message);
+          toast.error(`${data.message}`, {
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            duration: 4000,
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+            
+          });
+
+          setTimeout(() => {
+            setIsBookingError('');
+          }
+          , 4000);
+        }
+      }
+      ).catch(error => {
         setIsCheckingHour(false);
-      }, 3000);
+        setIsBookingError('Something went wrong');
+        toast.error('Something went wrong',{
+          style: {
+            border: '1px solid #713200',
+            padding: '16px',
+            color: '#713200',
+          },
+          iconTheme: {
+            primary: '#713200',
+            secondary: '#FFFAEE',
+          },
+        });
+      });
     }
   }
   , [
@@ -215,6 +437,7 @@ export default function Component({params}:Props) {
   const handleHourClick = (hour: number ) => {
     if (selectedHour !== hour) {
       setSelectedHour(hour);
+       
     } else {
       // If the same hour is clicked again, unselect it
       setSelectedHour(null);
@@ -828,6 +1051,7 @@ export default function Component({params}:Props) {
     if (localStorage.getItem('isExpert')) {
       setIsExpert(true);
     }
+    fetchRequests();
   }
   , [
     router
@@ -1201,10 +1425,10 @@ const browseImageOnly = (e: any) => {
     {
       /* fetching skeleton */
       isFetching && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-gray-500 bg-opacity-50">
-          <div className="flex items-center justify-center w-20 h-20">
-            <div className="w-10 h-10 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
-          </div>
+        <div className="">
+          <div className="flex items-center justify-center min-h-screen bg-white">
+          <Loader />
+        </div>
         </div>
       )
     }
@@ -1223,11 +1447,10 @@ const browseImageOnly = (e: any) => {
              <X className=" h-7 text-white" />
             </button>
             <div className="relative w-full h-full">
-              <Image
-                src={user?.profilepicURL ? user?.profilepicURL : image}
+              <img
+                  src={`https://ui-avatars.com/api/?background=random&name=${user?.firstName}+${user?.lastName}`}
                 alt=""
-                layout="fill"
-                objectFit="contain"
+                width={100} height={100}
                 className="w-full h-full"
               />
               {
@@ -1336,7 +1559,7 @@ const browseImageOnly = (e: any) => {
       
           <div className="relative">
   <img 
-    src={user?.profilepicURL ? user?.profilepicURL : image}
+    src={`https://ui-avatars.com/api/?background=random&name=${user?.firstName}+${user?.lastName}`}
     alt="" 
     width={100} height={100}
     onClick={handleZoom}
@@ -1421,6 +1644,24 @@ const browseImageOnly = (e: any) => {
                      }
                   
                   </div>
+                  
+                   
+                      <div className="space-y-2">
+                        <Label htmlFor="location">Location</Label>
+                        <Input
+                        value={newUser.location ? newUser.location : user?.location}
+                        placeholder={user?.location}
+                        onChange={(e) => setNewUser({ ...newUser, location: e.target.value })}
+                         id="location" type="text" />
+                         {
+                           /* fetching input skeleton */
+                            !user?.location && (
+                              <div className="flex items-center justify-center w-full h-10 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
+                            )
+                         }
+                      </div>
+                    
+                  
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -1508,6 +1749,36 @@ const browseImageOnly = (e: any) => {
               )
              }
              {
+              isExpert && (<>
+              <CardDescription className=" font-extrabold text-2xl justify-center items-center mx-auto flex m-2">
+                All Booking Requests
+              </CardDescription>
+              <div className="flex flex-wrap justify-center">
+
+                {requests.map((request) => (
+                  <RequestCard key={request.id} request={request} />
+                ))}
+              </div>
+              </>)
+             }
+             {
+              isFetchingRequests && isExpert && (
+                <div className=" flex justify-center items-center mx-auto">
+                 <Loader2 className=" animate-spin" size={30} />
+                </div>
+              )
+             }
+             {
+              requests.length === 0 && isExpert && (
+                <div className=" flex justify-center items-center mx-auto">
+                  <span className="text-gray-500 dark:text-gray-400">No requests</span>
+                </div>
+              )
+             }
+             {
+
+             }
+             {
               !isExpert && (
                 <Card className="p-2 m-2">
                   <CardContent className="space-y-4">
@@ -1536,6 +1807,20 @@ const browseImageOnly = (e: any) => {
                           <a href={`mailto:${user?.email}`} className=" text-black no-underline ">
                             <Mail className="w-5 h-5" />
                           </a>
+                        </CardDescription>
+                      </Card>
+                    </div>
+                    <div className="space-y-2">
+                      <Card className=" p-2 ">
+                        <CardTitle>Location</CardTitle>
+                        <CardDescription className="flex items-start gap-x-2 m-2 justify-start">
+                          <Badge className=" bg-transparent h-5 text-black hover:bg-transparent text-lg font-medium">
+                          {user?.location}
+                          </Badge>
+                          {/* location */}
+                          <span className=" text-black no-underline ">
+                            <MapPin className="w-5 h-5" />
+                          </span>
                         </CardDescription>
                       </Card>
                     </div>
@@ -2028,6 +2313,18 @@ const browseImageOnly = (e: any) => {
 
                   )
                  }
+                 {
+                  isBookingSuccess !== '' && (
+                    <p className="text-green-500">{
+                      isBookingSuccess 
+                    }</p>
+                  )
+                 }
+                 {
+                  isBookingError !== '' && (
+                    <p className="text-red-500">{isBookingError}</p>
+                  )
+                 }
                  {/* checking hour availability  */}
                   {
                     isCheckingHour && (
@@ -2049,6 +2346,8 @@ const browseImageOnly = (e: any) => {
                   <Label htmlFor="full_name">Full Name</Label>
                   <Input
                     id="full_name"
+                    value={bookingName}
+                    onChange={(e) => setBookingName(e.target.value)}
                     type="text"
                     placeholder="Enter your full name"
                   />
@@ -2057,6 +2356,8 @@ const browseImageOnly = (e: any) => {
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
+                    value={bookingEmail}
+                    onChange={(e) => setBookingEmail(e.target.value)}
                     type="email"
                     placeholder="Enter your email"
                   />
@@ -2064,12 +2365,17 @@ const browseImageOnly = (e: any) => {
                 <div className="space-y-2">
                   <Label htmlFor="message">Message</Label>
                   <Textarea
+                  value={bookingMessage}
+                  onChange={(e) => setBookingMessage(e.target.value)}
                     id="message"
                     placeholder="Enter your message"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Button className="justify-self-center flex justify-center items-center mx-auto w-full">Book 
+                  <Button 
+                  onClick={handleBooking}
+                  disabled={isCheckingHour || selectedHour === null || isBooking}
+                  className="justify-self-center flex justify-center items-center mx-auto w-full">Book 
                     Meeting
                   </Button>
                 </div>

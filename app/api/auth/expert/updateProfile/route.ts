@@ -35,6 +35,7 @@ export async function POST(req: Request, res: Response) {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
+        location: data.location,
     };
 
     // Update user

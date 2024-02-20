@@ -44,7 +44,7 @@ const Register = () => {
         setLoading(false);
         return
       }
-      if(data.status === 200){
+     
         setTimeout(() => {
         setLoading(false);
         window.location.href = '/Login';
@@ -61,7 +61,7 @@ const Register = () => {
             secondary: '#FFFAEE',
           },
         });
-      }
+      
 
       
     } catch (error:any) {
