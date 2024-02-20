@@ -267,7 +267,7 @@ export default function Component ({params}:Props) {
           
           <i className="text-gray-600 dark:text-gray-400 p-6">
             <Quote className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-          Construction may encompass a wide variety of activities, from laying down bricks to putting up high-rise buildings, but all construction projects share one common characteristic: They are all aimed at building something tangible and lasting." - Unknown
+          Construction may encompass a wide variety of activities, from laying down bricks to putting up high-rise buildings, but all construction projects share one common characteristic: They are all aimed at building something tangible and lasting.&quot; - Unknown
             {/* <Quote className="w-6 h-6 text-gray-700 dark:text-gray-300" /> */}
           </i>
        
