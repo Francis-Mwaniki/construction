@@ -1,10 +1,12 @@
 "use client";
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription } from '@/components/ui/card';
-import { HomeIcon, Loader2, LogIn, LogOut } from 'lucide-react';
+import { CheckCircle2, HomeIcon, Loader2, LogIn, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ClassAttributes, HTMLAttributes } from 'react';
 import toast, { Toast } from 'react-hot-toast';
+import { ResponsivePie } from "@nivo/pie"
 
 interface Expert {
     id : number;
@@ -32,7 +34,7 @@ interface Expert {
         password: string;
         }
 
-
+       
 export default function Dashboard() {
   const router = useRouter();
   const [allExperts, setAllExperts] = useState<Expert[]>([]);
@@ -44,6 +46,25 @@ export default function Dashboard() {
     const [fetchingUsers, setFetchingUsers] = useState(true);
     const [fetchingActiveUsers, setFetchingActiveUsers] = useState(true);
   const [email, setEmail] = useState('');
+  const [calculatedUser, setCalculatedUser] = useState<any[]>([
+    {
+      id: "All Experts",
+      value: 3,
+    },
+    {
+      id: "Active Experts",
+      value: 6,
+    },
+    {
+      id: "All Users",
+      value: 5,
+    },
+    {
+      id: "Active Users",
+      value: 4,
+    },
+  ]);
+
     //check if user is admin
     useEffect(() => {
       const isAdmin = localStorage.getItem('isAdmin');
@@ -181,8 +202,37 @@ export default function Dashboard() {
     router.push('/LoginAsAdmin');
   }
 
+
+  useEffect(() => {
+    const data = [
+      {
+        id: "Active Experts",
+        value: activeExperts.length,
+      },
+      {
+        id: "All Experts",
+        value: allExperts.length,
+      },
+      {
+        id: "Active Users",
+        value: activeUsers.length,
+      },
+      {
+        id: "All Users",
+        value: allUsers.length,
+      },
+    ];
+    setCalculatedUser(data);
+  }
+  ,[
+    allExperts,
+    activeExperts,
+    allUsers,
+    activeUsers
+  ]);
   return (
     <>
+   
      <section className=" p-4 min-h-screen overflow-hidden">
       <div className="container mx-auto p-4">
        <Card className='p-2 m-3 flex  flex-row justify-between items-center gap-x-3'>
@@ -202,6 +252,33 @@ export default function Dashboard() {
       
 
        </Card>
+       <div className="border shadow-sm rounded-lg">
+
+<h2 className="text-lg font-semibold p-4">Content Categories</h2>
+
+{
+  allExperts.length > 0 && activeExperts.length > 0 && allUsers.length > 0 && activeUsers.length > 0 && (
+    <div className="grid grid-cols-1  gap-4 p-4">
+      <div className="bg-white p-4 border border-gray-500 shadow rounded-md">
+      <PieChart  className="w-full aspect-[4/3]" calculatedUser={calculatedUser} />
+      </div>
+     
+    </div>
+  )
+}
+
+  
+    {/* <div className="p-4">
+     
+      <Card className="bg-white p-4  shadow rounded-md">
+      <PieChart2  className="w-full aspect-[4/3]" />
+      </Card>
+    </div> */}
+  
+
+
+
+</div>
   <Card className="p-4 mb-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white max-h-80 border border-gray-500  overflow-y-auto p-4 shadow rounded-md">
@@ -261,8 +338,10 @@ export default function Dashboard() {
             }
           </div>
 
-          <div className="bg-white p-4  overflow-y-auto min-h-80 border border-gray-500 shadow rounded-md">
-            <CardDescription className="text-xl font-semibold mb-2">Active Experts</CardDescription>
+          <div className="bg-white max-h-80 border border-gray-500  overflow-y-auto p-4 shadow rounded-md">
+            <CardDescription className="text-xl font-semibold mb-2">Active Experts
+             <Badge className='text-green-200 bg-green-500'>Active {" "} <CheckCircle2 className=' h-5 w-5' /></Badge>
+            </CardDescription>
             {activeExperts.map((expert:Expert,index:number) => (
                /* random numbering */
                <Card key={index} className='p-2 flex justify-start items-start gap-2  flex-col m-2  sm:min-w-[500px]'>
@@ -324,9 +403,9 @@ export default function Dashboard() {
             {allUsers?.map((user:User,index:number) => (
                <div key={index} className='flex items-center gap-x-1'>
                <span>
-                    {index+1}
+                   <div key={index}>{ user.id}</div>
                 </span>
-                <div key={index}>{ user.email}</div>
+               <div key={index}>{ user.email}</div> -. <div key={index} className=' text-xs'>{ user.username}</div> 
                </div>
             ))}
             {
@@ -342,13 +421,13 @@ export default function Dashboard() {
           </div>
 
           <div className="bg-white p-4 overflow-y-auto min-h-80 border border-gray-500  shadow rounded-md">
-            <CardDescription className="text-xl font-semibold mb-2">Active Users</CardDescription>
+            <CardDescription className="text-xl font-semibold mb-2">Active Users {' '} <Badge className='text-green-200 bg-green-500'>Active <CheckCircle2 className=' h-5 w-5' /></Badge></CardDescription>
             {activeUsers?.map ((user:User,index:number) => (
-              <div key={index} className='flex items-center gap-x-1'>
+              <div key={index} className='flex items-center gap-y-3 gap-x-1'>
               <span>
-                    {index+1}
+                   <div key={index}>{ user.id}</div>
                 </span>
-                <div key={index}>{ user.email}</div>
+                <div key={index}>{ user.email}</div>  . -. <div className=' m-1 text-xs' key={index}>{ user.username}</div> {/* active all */} 
               </div>
             ))}
             {
@@ -368,4 +447,123 @@ export default function Dashboard() {
     </section>
     </>
   );
+}
+function PieChart(props: JSX.IntrinsicAttributes & ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & { calculatedUser: any[]; }) {
+  return (
+    <div {...props}>
+      <ResponsivePie
+        data={
+          props.calculatedUser
+        }
+        sortByValue
+        margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+        cornerRadius={0}
+        activeOuterRadiusOffset={2}
+        borderWidth={1}
+        borderColor={{
+          from: "color",
+          modifiers: [["darker", 0.2]],
+        }}
+        arcLabel="id"
+        arcLabelsRadiusOffset={0.6}
+        arcLabelsTextColor={{
+          from: "color",
+          modifiers: [["darker", 2]],
+        }}
+        enableArcLinkLabels={false}
+        colors={{ scheme: "paired" }}
+        legends={[
+          {
+            anchor: "bottom",
+            direction: "row",
+            justify: false,
+            translateX: 0,
+            translateY: 56,
+            itemsSpacing: 0,
+            itemWidth: 50,
+            itemHeight: 18,
+            itemDirection: "left-to-right",
+            symbolSize: 18,
+            symbolShape: "circle",
+          },
+        ]}
+        theme={{
+          tooltip: {
+            container: {
+              fontSize: "12px",
+            },
+          },
+        }}
+        role="application"
+      />
+    </div>
+  )
+}
+function PieChart2(props: JSX.IntrinsicAttributes & ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> ) {
+  return (
+    <div {...props}>
+      <ResponsivePie
+        data={
+          [
+            {
+              id: "Active Experts",
+              value: 2,
+            },
+            {
+              id: "All Experts",
+              value: 2,
+            },
+            {
+              id: "Active Users",
+              value: 5,
+            },
+            {
+              id: "All Users",
+              value: 5,
+            },
+          ]
+        }
+        sortByValue
+        margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+        cornerRadius={0}
+        activeOuterRadiusOffset={2}
+        borderWidth={1}
+        borderColor={{
+          from: "color",
+          modifiers: [["darker", 0.2]],
+        }}
+        arcLabel="id"
+        arcLabelsRadiusOffset={0.6}
+        arcLabelsTextColor={{
+          from: "color",
+          modifiers: [["darker", 2]],
+        }}
+        enableArcLinkLabels={false}
+        colors={{ scheme: "paired" }}
+        legends={[
+          {
+            anchor: "bottom",
+            direction: "row",
+            justify: false,
+            translateX: 0,
+            translateY: 56,
+            itemsSpacing: 0,
+            itemWidth: 50,
+            itemHeight: 18,
+            itemDirection: "left-to-right",
+            symbolSize: 18,
+            symbolShape: "circle",
+          },
+        ]}
+        theme={{
+          tooltip: {
+            container: {
+              fontSize: "12px",
+            },
+          },
+        }}
+        role="application"
+      />
+    </div>
+  )
 }
