@@ -2287,7 +2287,12 @@ const browseImageOnly = (e: any) => {
                         key={hour}
                         className={`${
                           selectedHour === hour ? 'bg-black text-white' : 'bg-gray-200'
-                        } px-4 py-2 my-2 rounded focus:outline-none`}
+                        }
+                        /* border red if isAccpeted is true within the hour */
+                        ${
+                         requests.some((request) => request.isAccepted && request.hour === hour) ? 'border border-red-500' : ''
+                        }
+                         px-4 py-2 my-2 rounded focus:outline-none`}
                         onClick={() => handleHourClick(hour)}
                         disabled={selectedHour !== null && selectedHour !== hour}
                       >
